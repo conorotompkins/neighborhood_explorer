@@ -82,10 +82,14 @@ ac_housing_hu %>%
   group_by(year) %>% 
   summarize(housing_units = sum(housing_units)) %>% 
   ungroup() %>% 
-  #mutate(year = fct_inorder(year)) %>% 
-  ggplot(aes(year, housing_units, group = 1)) +
+  mutate(diff = housing_units - lag(housing_units)) %>% 
+  pivot_longer(cols = c(housing_units, diff), names_to = "measure", values_to = "metric") %>% 
+  mutate(year = fct_inorder(as.character(year)),
+         measure = factor(measure, levels = c("housing_units", "diff"), labels = c("Total Units", "Change in Units"))) %>%  
+  ggplot(aes(year, metric, group = 1)) +
   geom_line() +
   geom_point() +
+  facet_wrap(~measure, ncol = 1, scales = "free_y") +
   scale_y_comma() +
   labs(x = "Year",
        y  = "Housing Units")
@@ -126,14 +130,20 @@ hu_diff %>%
 
 hu_diff %>% 
   pivot_longer(cols = c(`1940`, `2019`), names_to = "year", values_to = "housing_units") %>% 
+  #mutate(GEOID10 = fct_inorder(GEOID10, diff)) %>% 
   ggplot(aes(year, housing_units, group = GEOID10)) +
   geom_line(alpha = .3) +
-  geom_point(aes(alpha = diff)) +
-  scale_alpha_continuous(range = c(.1, .8)) +
+  geom_point() +
+  #scale_alpha_continuous(range = c(.1, .8)) +
+  transition_reveal(diff) +
   labs(title = "Housing Unit Change from 1940-2019",
        x = "Year",
        y = "Housing Units",
-       alpha = "Difference")
+       alpha = "Difference") +
+  theme(panel.grid.minor.y = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_blank(),
+        axis.title.x = element_blank())
 
 tract_order_1940 <- ac_housing_hu %>% 
   filter(year == 1940) %>% 
@@ -166,44 +176,13 @@ ac_hu_map
 
 ggsave("output/ac_hu_map.png", ac_hu_map, width = 12, height = 12, dpi = 300)
 
-#urbanization
-#doesnt account for tracts that "deurbanize"
-
-ac_housing_uy <- ac_housing %>% 
-  select(GEOID10, UY1, UY2) %>% 
-  pivot_longer(cols = starts_with("UY"), names_to = "type", values_to = "uy")
-
-ac_housing_uy %>% 
-  st_drop_geometry() %>% 
-  select(GEOID10, type, uy) %>% 
-  ggplot(aes(uy, fill = type)) +
-  geom_histogram() +
-  facet_wrap(~type, ncol = 2)
-
-ac_housing_uy %>% 
-  select(GEOID10, type, uy) %>% 
-  filter(type == "UY1") %>% 
-  ggplot() +
-  geom_sf(aes(fill = uy), color = NA) +
-  scale_fill_viridis_c() +
-  theme_bw() +
-  theme(axis.text = element_blank())
-
-ac_housing_uy %>% 
-  select(GEOID10, type, uy) %>% 
-  filter(type == "UY2") %>% 
-  ggplot() +
-  geom_sf(aes(fill = uy), color = NA) +
-  scale_fill_viridis_c() +
-  theme_bw() +
-  theme(axis.text = element_blank())
 
 #try with pdev vars
 
 ac_dev <- ac_housing %>% 
   select(GEOID10, starts_with("pdev")) %>% 
   pivot_longer(cols = starts_with("pdev"), names_to = "year", values_to = "pct_dev") 
-  
+
 dev_years <- ac_dev %>% 
   st_drop_geometry() %>% 
   distinct(year) %>% 
@@ -263,6 +242,26 @@ ac_density %>%
 
 histogram_anim <- ac_density %>% 
   st_drop_geometry() %>% 
+  select(GEOID10, year, density) %>% 
+  mutate(#density = cut_width(density, width = 1, boundary = .5)
+    density = round(density, 0)) %>% 
+  count(year, density) %>% 
+  ggplot(aes(density, n, fill = density)) +
+  geom_col() +
+  scale_fill_viridis_c() +
+  transition_states(year) +
+  labs(title = "More housing units created in suburban areas",
+       subtitle = "{closest_state}",
+       x = "Density (units per sq. mile)",
+       y = "Count of census tracts",
+       fill = "Density")
+
+histogram_anim <- animate(histogram_anim)
+
+histogram_anim
+
+histogram_anim_old <- ac_density %>% 
+  st_drop_geometry() %>% 
   mutate(year = as.factor(year)) %>% 
   ggplot(aes(density)) +
   geom_histogram(bins = 60) +
@@ -272,9 +271,9 @@ histogram_anim <- ac_density %>%
        x = "Density (units per sq. mile)",
        y = "Count of census tracts")
 
-histogram_anim <- animate(histogram_anim)
-histogram_anim
-  
+histogram_anim_old <- animate(histogram_anim_old)
+histogram_anim_old
+
 scatter_plot_anim <- ac_density %>% 
   ggplot(aes(sqmi, housing_units, color = density)) +
   geom_point() +
