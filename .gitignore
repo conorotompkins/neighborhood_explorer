@@ -42,4 +42,5 @@ vignettes/*.pdf
 
 data
 
-output
+outputs
+inputs
