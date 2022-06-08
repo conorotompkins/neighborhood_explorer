@@ -3,6 +3,8 @@ library(leaflet)
 library(sf)
 library(dplyr)
 
+#https://stackoverflow.com/questions/65893124/select-multiple-items-using-map-click-in-leaflet-linked-to-selectizeinput-in
+
 #load shapefile
 nc <- st_read(system.file("shape/nc.shp", package="sf")) %>%
   st_transform(4326)
