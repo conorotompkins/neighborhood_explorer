@@ -1,13 +1,16 @@
+library(tidyverse)
 library(shiny)
 library(leaflet)
 library(sf)
-library(dplyr)
+library(DT)
 
 #https://stackoverflow.com/questions/65893124/select-multiple-items-using-map-click-in-leaflet-linked-to-selectizeinput-in
 
 #load shapefile
 nc <- st_read(system.file("shape/nc.shp", package="sf")) %>%
   st_transform(4326)
+
+glimpse(nc)
 
 shinyApp(
   ui = fluidPage(
@@ -21,7 +24,8 @@ shinyApp(
                    label = "selected",
                    choices = nc$NAME,
                    selected = NULL,
-                   multiple = TRUE)
+                   multiple = TRUE),
+    DT::dataTableOutput("geoid_table")
   ),
   
   server <- function(input, output, session){
@@ -72,7 +76,11 @@ shinyApp(
                            label = "",
                            choices = nc$NAME,
                            selected = selected$groups)
+      
+      #print(input$selected_locations)
+      print(selected$groups)
     })
+    
     
     observeEvent(input$selected_locations, {
       removed_via_selectInput <- setdiff(selected$groups, input$selected_locations)
@@ -88,5 +96,18 @@ shinyApp(
         proxy %>% showGroup(group = added_via_selectInput)
       }
     }, ignoreNULL = FALSE)
+    
+    geoid_table <- reactive({
+      
+      selected$groups %>% 
+        enframe()
+      
+    })
+    
+    output$geoid_table <- DT::renderDataTable({
+      
+      geoid_table()
+      
+    })
     
   })
