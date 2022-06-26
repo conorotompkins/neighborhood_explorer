@@ -24,7 +24,6 @@ shinyApp(
   server <- function(input, output, session){
     
     #create empty vector to hold all click ids
-    selected_ids <- reactiveValues(ids = vector())
     
     #initial map output
     output$map <- renderLeaflet({
@@ -66,21 +65,6 @@ shinyApp(
       }
       print(selected$groups)
     })
-    
-    observeEvent(input$selected_locations, {
-      removed_via_selectInput <- setdiff(selected$groups, input$selected_locations)
-      added_via_selectInput <- setdiff(input$selected_locations, selected$groups)
-      
-      if(length(removed_via_selectInput) > 0){
-        selected$groups <- input$selected_locations
-        proxy %>% hideGroup(group = removed_via_selectInput)
-      }
-      
-      if(length(added_via_selectInput) > 0){
-        selected$groups <- input$selected_locations
-        proxy %>% showGroup(group = added_via_selectInput)
-      }
-    }, ignoreNULL = FALSE)
     
     geoid_table <- reactive({
       
