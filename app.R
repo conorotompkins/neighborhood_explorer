@@ -18,13 +18,6 @@ shinyApp(
     "Update selectize input by clicking on the map",
     
     leafletOutput("map"),
-    "I would like the selectize input to update to show all the locations selected,",
-    "but also when items are removed here, they are removed on the map too, so linked to the map.",
-    selectizeInput(inputId = "selected_locations",
-                   label = "selected",
-                   choices = nc$NAME,
-                   selected = NULL,
-                   multiple = TRUE),
     DT::dataTableOutput("geoid_table")
   ),
   
@@ -71,16 +64,8 @@ shinyApp(
         selected$groups <- setdiff(selected$groups, input$map_shape_click$group)
         proxy %>% hideGroup(group = input$map_shape_click$group)
       }
-      updateSelectizeInput(session,
-                           inputId = "selected_locations",
-                           label = "",
-                           choices = nc$NAME,
-                           selected = selected$groups)
-      
-      #print(input$selected_locations)
       print(selected$groups)
     })
-    
     
     observeEvent(input$selected_locations, {
       removed_via_selectInput <- setdiff(selected$groups, input$selected_locations)
