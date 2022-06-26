@@ -10,18 +10,13 @@ options(tigris_use_cache = TRUE)
 #https://stackoverflow.com/questions/65893124/select-multiple-items-using-map-click-in-leaflet-linked-to-selectizeinput-in
 
 #load shapefile
-nc <- st_read(system.file("shape/nc.shp", package="sf")) %>%
-  st_transform(4326)
-
-glimpse(nc)
-
 ac_geo <- get_acs(geography = "tract", 
                   state = "Pennsylvania",
                   county = "Allegheny County",
                   variables = c(medincome = "B19013_001"),
                   year = 2020,
                   geometry = T) %>% 
-  select(GEOID, geometry) %>% 
+  select(GEOID, geometry, variable, estimate, moe) %>% 
   st_transform(4326) %>% 
   mutate(NAME = str_c("Tract", GEOID, sep = " ")) #needs to be different than only GEOID value
 
@@ -30,10 +25,19 @@ glimpse(ac_geo)
 shinyApp(
   ui = fluidPage(
     
-    "Update selectize input by clicking on the map",
+    fluidRow(
+      
+      leafletOutput("map")
+    ),
     
-    leafletOutput("map"),
-    DT::dataTableOutput("geoid_table")
+    fluidRow(
+      column(width = 4,
+        DT::dataTableOutput("geoid_table")
+      ),
+      column(width = 7,
+        plotOutput("bar_chart")
+      )
+    )
   ),
   
   server <- function(input, output, session){
@@ -86,14 +90,33 @@ shinyApp(
     
     geoid_table <- reactive({
       
+      req(length(selected$groups) > 0)
+      
       selected$groups %>% 
-        enframe()
+        enframe(value = "GEOID") %>% 
+        select(-name) %>% 
+        left_join(st_drop_geometry(ac_geo), by = "GEOID") %>% 
+        select(NAME, GEOID, variable, estimate, moe) %>% 
+        mutate(GEOID = fct_reorder(GEOID, estimate))
       
     })
     
     output$geoid_table <- DT::renderDataTable({
       
+      req(geoid_table())
+      
       geoid_table()
+      
+    })
+    
+    output$bar_chart <- renderPlot({
+      
+      req(geoid_table)
+      
+      geoid_table() %>% 
+        ggplot(aes(estimate, GEOID)) +
+        geom_col() +
+        theme_bw()
       
     })
     
