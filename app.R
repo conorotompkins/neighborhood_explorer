@@ -1,8 +1,11 @@
 library(tidyverse)
+library(tidycensus)
 library(shiny)
 library(leaflet)
 library(sf)
 library(DT)
+
+options(tigris_use_cache = TRUE)
 
 #https://stackoverflow.com/questions/65893124/select-multiple-items-using-map-click-in-leaflet-linked-to-selectizeinput-in
 
@@ -11,6 +14,19 @@ nc <- st_read(system.file("shape/nc.shp", package="sf")) %>%
   st_transform(4326)
 
 glimpse(nc)
+
+ac_geo <- get_acs(geography = "tract", 
+                  state = "Pennsylvania",
+                  county = "Allegheny County",
+                  variables = c(medincome = "B19013_001"),
+                  year = 2020,
+                  geometry = T) %>% 
+  select(GEOID, geometry) %>% 
+  st_transform(4326) %>% 
+  mutate(basemap = "basemap")
+
+glimpse(ac_geo)
+
 
 shinyApp(
   ui = fluidPage(
