@@ -114,8 +114,9 @@ shinyApp(
       req(geoid_table)
       
       geoid_table() %>% 
-        ggplot(aes(estimate, GEOID)) +
-        geom_col() +
+        ggplot(aes(y = GEOID)) +
+        geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+        geom_point(aes(x = estimate), size = 2) +
         theme_bw()
       
     })
