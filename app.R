@@ -23,10 +23,9 @@ ac_geo <- get_acs(geography = "tract",
                   geometry = T) %>% 
   select(GEOID, geometry) %>% 
   st_transform(4326) %>% 
-  mutate(basemap = "basemap")
+  mutate(NAME = str_c("Tract", GEOID, sep = " ")) #needs to be different than only GEOID value
 
 glimpse(ac_geo)
-
 
 shinyApp(
   ui = fluidPage(
@@ -45,7 +44,8 @@ shinyApp(
     output$map <- renderLeaflet({
       leaflet() %>%
         addTiles() %>%
-        addPolygons(data = nc,
+        #basemap
+        addPolygons(data = ac_geo,
                     fillColor = "white",
                     fillOpacity = 0.5,
                     color = "black",
@@ -54,15 +54,17 @@ shinyApp(
                     layerId = ~NAME,
                     group = "regions",
                     label = ~NAME) %>%
-        addPolygons(data = nc,
+        #selected polygons
+        addPolygons(data = ac_geo,
                     fillColor = "red",
                     fillOpacity = 0.5,
                     weight = 1,
                     color = "black",
                     stroke = TRUE,
-                    layerId = ~CNTY_ID,
-                    group = ~NAME) %>%
-        hideGroup(group = nc$NAME) # nc$CNTY_ID
+                    layerId = ~GEOID,
+                    group = ~GEOID) %>%
+        #hide selected polygons at start
+        hideGroup(group = ac_geo$GEOID)
     }) #END RENDER LEAFLET
     
     #define leaflet proxy for second regional level map
@@ -73,8 +75,8 @@ shinyApp(
     
     observeEvent(input$map_shape_click, {
       if(input$map_shape_click$group == "regions"){
-        selected$groups <- c(selected$groups, input$map_shape_click$id)
-        proxy %>% showGroup(group = input$map_shape_click$id)
+        selected$groups <- c(selected$groups, str_remove(input$map_shape_click$id, "^Tract ")) #remove "Tract " from start of id on the fly
+        proxy %>% showGroup(group = str_remove(input$map_shape_click$id, "^Tract "))
       } else {
         selected$groups <- setdiff(selected$groups, input$map_shape_click$group)
         proxy %>% hideGroup(group = input$map_shape_click$group)
