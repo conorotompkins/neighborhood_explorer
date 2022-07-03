@@ -25,9 +25,11 @@ get_data <- function(x){
   
   switch(x,
          housing = get_housing_data(),
-         median_income = get_median_income())
+         median_income = get_median_income()
+         )
 
 }
 
 #get_data("housing")
-#get_data("median_income")
+get_data("median_income")
+
