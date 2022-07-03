@@ -31,5 +31,5 @@ get_data <- function(x){
 }
 
 #get_data("housing")
-get_data("median_income")
+#get_data("median_income")
 
