@@ -16,7 +16,7 @@ ac_geo <- get_acs(geography = "tract",
                   variables = c(medincome = "B19013_001"),
                   year = 2020,
                   geometry = T) %>% 
-  select(GEOID, geometry, variable, estimate, moe) %>% 
+  select(GEOID, geometry) %>% 
   st_transform(4326) %>% 
   mutate(NAME = str_c("Tract", GEOID, sep = " ")) #needs to be different than only GEOID value
 
