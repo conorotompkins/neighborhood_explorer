@@ -51,7 +51,7 @@ tract_changes_anim <- animate(tract_changes, nframes = 200, fps = 20,
 
 tract_changes_anim
 
-anim_save(filename = "tract_changes_anim.gif", anim = tract_changes_anim)
+anim_save(filename = "outputs/tract_changes_anim.gif", anim = tract_changes_anim)
 
 ac_geo_2010 %>% 
   st_drop_geometry() %>% 
