@@ -26,19 +26,18 @@ ac_geo <- get_acs(geography = "tract",
   st_transform(4326) %>% 
   mutate(NAME = str_c("Tract", GEOID, sep = " ")) #needs to be different than only GEOID value
 
-
 ui <- fluidPage(
   
   sidebarLayout(
     
-    sidebarPanel(
+    sidebarPanel(width = 2,
       
       radioButtons(inputId = "data_source",
                    label = "Choose topic",
                    choices = c("median_income", "housing"))
     ),
     
-    mainPanel(
+    mainPanel(width = 10,
       
       fluidRow(
         
@@ -46,10 +45,10 @@ ui <- fluidPage(
       ),
       
       fluidRow(
-        column(width = 4,
+        column(width = 5,
                DT::dataTableOutput("geoid_table")
         ),
-        column(width = 7,
+        column(width = 5,
                plotOutput("bar_chart")
         )
       )
@@ -123,19 +122,25 @@ server <- function(input, output, session){
     
     req(geoid_table())
     
+    geoid_table() %>% 
+      distinct(graph_type) %>% 
+      pull() %>% 
+      print()
+    
     geoid_table()
     
   })
+  
+  
   
   output$bar_chart <- renderPlot({
     
     req(geoid_table)
     
     geoid_table() %>% 
-      ggplot(aes(y = GEOID)) +
-      geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
-      geom_point(aes(x = estimate), size = 2) +
-      theme_bw()
+      distinct(graph_type) %>% 
+      pull() %>% 
+      make_graph(geoid_table())
     
   })
   

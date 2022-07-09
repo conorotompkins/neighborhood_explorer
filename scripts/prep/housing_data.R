@@ -10,7 +10,8 @@ ac_housing <- st_read("inputs/raw/HHUUD10.gdb.zip") %>%
          COUNTY == "Allegheny") %>% 
   select(STATE, COUNTY, GEOID10, UY1, UY2, starts_with("hu"), starts_with("sqmi"), starts_with("pdev")) %>% 
   rename(GEOID = GEOID10) %>% 
-  st_drop_geometry()
+  st_drop_geometry() %>% 
+  as_tibble()
 
 ac_housing_hu <- ac_housing %>% 
   select(GEOID, starts_with("hu")) %>% 
@@ -23,8 +24,11 @@ year_lookup <- ac_housing_hu %>%
 ac_housing_hu <- ac_housing_hu %>% 
   left_join(year_lookup) %>% 
   select(-year) %>% 
-  rename(year = year_fixed) %>% 
-  select(GEOID, year, housing_units)
+  rename(year = year_fixed,
+         estimate = housing_units) %>% 
+  mutate(variable = "housing_units") %>% 
+  select(GEOID, variable, year, estimate) %>% 
+  mutate(graph_type = "time_series")
 
 ac_housing_hu %>% 
   write_csv("inputs/data_sources/housing_data.csv")
