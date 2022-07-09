@@ -12,6 +12,7 @@ get_acs(geography = "tract",
                   geometry = T) %>% 
   select(GEOID, geometry, variable, estimate, moe) %>% 
   mutate(NAME = str_c("Tract", GEOID, sep = " "),
-         graph_type = "point_in_time") %>% 
+         graph_type = "point_in_time",
+         census_year = 2020) %>% 
   st_drop_geometry() %>% 
   write_csv("inputs/data_sources/median_income.csv")
