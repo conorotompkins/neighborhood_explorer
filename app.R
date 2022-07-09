@@ -48,7 +48,7 @@ ui <- fluidPage(
         column(width = 5,
                DT::dataTableOutput("geoid_table")
         ),
-        column(width = 7,
+        column(width = 5,
                plotOutput("bar_chart")
         )
       )
