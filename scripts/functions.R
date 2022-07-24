@@ -9,7 +9,8 @@ get_housing_data <- function(){
       variable = col_character(),
       year = col_double(),
       estimate = col_double(),
-      graph_type = col_character()
+      graph_type = col_character(),
+      census_year = col_double()
     ))
   
 }
@@ -25,7 +26,9 @@ get_median_income <- function(x){
       variable = col_character(),
       estimate = col_double(),
       moe = col_double(),
-      NAME = col_character()
+      NAME = col_character(),
+      graph_type = col_character(),
+      census_year = col_double()
     ))
   
 }

@@ -28,7 +28,8 @@ ac_housing_hu <- ac_housing_hu %>%
          estimate = housing_units) %>% 
   mutate(variable = "housing_units") %>% 
   select(GEOID, variable, year, estimate) %>% 
-  mutate(graph_type = "time_series")
+  mutate(graph_type = "time_series",
+         census_year = 2010)
 
 ac_housing_hu %>% 
   write_csv("inputs/data_sources/housing_data.csv")

@@ -16,14 +16,8 @@ source(here("scripts/functions.R"))
 #https://stackoverflow.com/questions/65893124/select-multiple-items-using-map-click-in-leaflet-linked-to-selectizeinput-in
 
 #load shapefile
-ac_geo <- get_acs(geography = "tract", 
-                  state = "Pennsylvania",
-                  county = "Allegheny County",
-                  variables = c(medincome = "B19013_001"),
-                  year = 2020,
-                  geometry = T) %>% 
-  select(GEOID, geometry) %>% 
-  st_transform(4326) %>% 
+ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_history.shp") %>% 
+  rename(census_year = cnss_yr) %>% 
   mutate(NAME = str_c("Tract", GEOID, sep = " ")) #needs to be different than only GEOID value
 
 ui <- fluidPage(
@@ -31,33 +25,50 @@ ui <- fluidPage(
   sidebarLayout(
     
     sidebarPanel(width = 2,
-      
-      radioButtons(inputId = "data_source",
-                   label = "Choose topic",
-                   choices = c("median_income", "housing"))
+                 
+                 radioButtons(inputId = "data_source",
+                              label = "Choose topic",
+                              choices = c("median_income", "housing"))
     ),
     
     mainPanel(width = 10,
-      
-      fluidRow(
-        
-        leafletOutput("map")
-      ),
-      
-      fluidRow(
-        column(width = 5,
-               DT::dataTableOutput("geoid_table")
-        ),
-        column(width = 5,
-               plotOutput("bar_chart")
-        )
-      )
-      
+              
+              fluidRow(
+                
+                leafletOutput("map")
+              ),
+              
+              fluidRow(
+                column(width = 5,
+                       DT::dataTableOutput("geoid_table")
+                ),
+                column(width = 5,
+                       plotOutput("bar_chart")
+                )
+              )
+              
     )
   )
 )
 
 server <- function(input, output, session){
+  
+  data_source_reactive <- reactive({
+    
+    get_data(input$data_source)
+    
+  })
+  
+  ac_tracts_reactive <- reactive({
+    
+    target_year <- data_source_reactive() %>% 
+      distinct(census_year) %>% 
+      pull()
+    
+    ac_geo %>% 
+      filter(census_year == target_year)
+    
+  })
   
   #create empty vector to hold all click ids
   
@@ -66,7 +77,7 @@ server <- function(input, output, session){
     leaflet() %>%
       addTiles() %>%
       #basemap
-      addPolygons(data = ac_geo,
+      addPolygons(data = ac_tracts_reactive(),
                   fillColor = "white",
                   fillOpacity = 0.5,
                   color = "black",
@@ -76,7 +87,7 @@ server <- function(input, output, session){
                   group = "regions",
                   label = ~NAME) %>%
       #selected polygons
-      addPolygons(data = ac_geo,
+      addPolygons(data = ac_tracts_reactive(),
                   fillColor = "red",
                   fillOpacity = 0.5,
                   weight = 1,
@@ -85,16 +96,25 @@ server <- function(input, output, session){
                   layerId = ~GEOID,
                   group = ~GEOID) %>%
       #hide selected polygons at start
-      hideGroup(group = ac_geo$GEOID)
+      hideGroup(group = ac_tracts_reactive()$GEOID)
   }) #END RENDER LEAFLET
   
   #define leaflet proxy for second regional level map
   proxy <- leafletProxy("map")
-  
+
   #create empty vector to hold all click ids
   selected <- reactiveValues(groups = vector())
   
+  #reset selected tracts when data source changes
+  #eventually needs to only change when census tract year changes
+  observeEvent(input$data_source, {
+    
+    selected$groups <- NULL
+    
+  })
+  
   observeEvent(input$map_shape_click, {
+    
     if(input$map_shape_click$group == "regions"){
       selected$groups <- c(selected$groups, str_remove(input$map_shape_click$id, "^Tract ")) #remove "Tract " from start of id on the fly
       proxy %>% showGroup(group = str_remove(input$map_shape_click$id, "^Tract "))
@@ -102,17 +122,17 @@ server <- function(input, output, session){
       selected$groups <- setdiff(selected$groups, input$map_shape_click$group)
       proxy %>% hideGroup(group = input$map_shape_click$group)
     }
-    print(selected$groups)
-  })
+    # print(selected$groups)
+  }, ignoreInit = TRUE)
   
-  geoid_table <- reactive({
+  geoid_table_reactive <- reactive({
     
     req(length(selected$groups) > 0)
     
     selected$groups %>% 
       enframe(value = "GEOID") %>% 
       select(-name) %>% 
-      left_join(st_drop_geometry(ac_geo), by = "GEOID") %>% 
+      left_join(st_drop_geometry(ac_tracts_reactive()), by = "GEOID") %>% 
       select(NAME, GEOID) %>% 
       left_join(get_data(input$data_source))
     
@@ -120,14 +140,14 @@ server <- function(input, output, session){
   
   output$geoid_table <- DT::renderDataTable({
     
-    req(geoid_table())
+    req(geoid_table_reactive())
     
-    geoid_table() %>% 
-      distinct(graph_type) %>% 
-      pull() %>% 
-      print()
+    # geoid_table_reactive() %>% 
+    #   distinct(graph_type) %>% 
+    #   pull() %>% 
+    #   print()
     
-    geoid_table()
+    geoid_table_reactive()
     
   })
   
@@ -135,12 +155,12 @@ server <- function(input, output, session){
   
   output$bar_chart <- renderPlot({
     
-    req(geoid_table)
+    req(geoid_table_reactive)
     
-    geoid_table() %>% 
+    geoid_table_reactive() %>% 
       distinct(graph_type) %>% 
       pull() %>% 
-      make_graph(geoid_table())
+      make_graph(geoid_table_reactive())
     
   })
   
