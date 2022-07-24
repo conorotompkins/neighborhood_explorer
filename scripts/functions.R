@@ -62,7 +62,6 @@ make_graph <- function(graph_type, target_df){
 graph_point_in_time <- function(x){
   
   x %>% 
-    #mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
     ggplot(aes(y = GEOID)) +
     geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
     geom_point(aes(x = estimate), size = 2) +
