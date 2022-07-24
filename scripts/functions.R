@@ -65,7 +65,10 @@ graph_point_in_time <- function(x){
     ggplot(aes(y = GEOID)) +
     geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
     geom_point(aes(x = estimate), size = 2) +
-    theme_bw()
+    scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+    labs(x = "Value",
+         y = NULL) +
+    theme_bw(base_size = 14)
   
 }
 
