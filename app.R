@@ -44,7 +44,9 @@ ui <- fluidPage(
            
            column(width = 6,
                   
-                  DT::dataTableOutput("geoid_table")
+                  DT::dataTableOutput("geoid_table"),
+                  
+                  style = "height:500px; overflow-y: scroll;"
                   
            ),
            
@@ -157,6 +159,7 @@ server <- function(input, output, session){
       DT::datatable(options = list(autoWidth = TRUE,
                                    searching = FALSE),
                     filter = "none")
+                    
     
   })
   
