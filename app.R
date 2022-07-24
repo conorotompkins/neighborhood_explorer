@@ -22,32 +22,38 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
-  sidebarLayout(
-    
-    sidebarPanel(width = 2,
-                 
-                 radioButtons(inputId = "data_source",
-                              label = "Choose topic",
-                              choices = c("median_income", "housing"))
-    ),
-    
-    mainPanel(width = 10,
-              
-              fluidRow(
-                
-                leafletOutput("map")
-              ),
-              
-              fluidRow(
-                column(width = 5,
-                       DT::dataTableOutput("geoid_table")
-                ),
-                column(width = 5,
-                       plotOutput("bar_chart")
-                )
-              )
-              
-    )
+  column(width = 2,
+         
+         fluidRow(
+           
+           selectizeInput(inputId = "data_source",
+                          label = "Choose topic",
+                          choices = c("median_income", "housing"))
+         ),
+  ),
+  
+  column(width = 10,
+         
+         fluidRow(
+           
+           leafletOutput("map")
+           
+         ),
+         
+         fluidRow(
+           
+           column(width = 6,
+                  
+                  DT::dataTableOutput("geoid_table")
+                  
+           ),
+           
+           column(width = 6,
+                  
+                  plotOutput("bar_chart")
+           )
+         )
+         
   )
 )
 
@@ -101,7 +107,7 @@ server <- function(input, output, session){
   
   #define leaflet proxy for second regional level map
   proxy <- leafletProxy("map")
-
+  
   #create empty vector to hold all click ids
   selected <- reactiveValues(groups = vector())
   
