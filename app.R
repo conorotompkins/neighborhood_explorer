@@ -153,13 +153,33 @@ server <- function(input, output, session){
     #   pull() %>% 
     #   print()
     
-    geoid_table_reactive() %>% 
+    var_name <- geoid_table_reactive() %>% 
+      distinct(variable) %>% 
+      pull()
+    
+    var_name_proper <- var_name %>% 
+      str_replace_all("_", " ") %>% 
+      str_to_title()
+    
+    table_df <- geoid_table_reactive() %>% 
+      select(-c(NAME, graph_type))
+    
+    table_df_names <- names(table_df) %>% 
+      str_replace("moe", "Margin of Error") %>%
+      str_replace("estimate", var_name) %>%
+      str_replace("census_year", "Census Year") %>% 
+      str_replace("year", "Year") %>%
+      str_replace(var_name, var_name_proper)
+    
+    names(table_df) <- table_df_names
+    
+    table_df %>% 
+      select(-variable) %>% 
       DT::datatable(options = list(autoWidth = TRUE,
                                    searching = FALSE,
                                    lengthChange = FALSE,
                                    pageLength = 5),
                     filter = "none")
-                    
     
   })
   
