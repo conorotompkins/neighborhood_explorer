@@ -22,32 +22,38 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
-  sidebarLayout(
-    
-    sidebarPanel(width = 2,
-                 
-                 radioButtons(inputId = "data_source",
-                              label = "Choose topic",
-                              choices = c("median_income", "housing"))
-    ),
-    
-    mainPanel(width = 10,
-              
-              fluidRow(
-                
-                leafletOutput("map")
-              ),
-              
-              fluidRow(
-                column(width = 5,
-                       DT::dataTableOutput("geoid_table")
-                ),
-                column(width = 5,
-                       plotOutput("bar_chart")
-                )
-              )
-              
-    )
+  column(width = 2,
+         
+         fluidRow(
+           
+           selectizeInput(inputId = "data_source",
+                          label = "Choose topic",
+                          choices = c("median_income", "housing"))
+         ),
+  ),
+  
+  column(width = 10,
+         
+         fluidRow(
+           
+           leafletOutput("map")
+           
+         ),
+         
+         fluidRow(
+           
+           column(width = 6,
+                  
+                  DT::dataTableOutput("geoid_table")
+                  
+           ),
+           
+           column(width = 6,
+                  
+                  plotOutput("bar_chart")
+           )
+         )
+         
   )
 )
 
@@ -101,7 +107,7 @@ server <- function(input, output, session){
   
   #define leaflet proxy for second regional level map
   proxy <- leafletProxy("map")
-
+  
   #create empty vector to hold all click ids
   selected <- reactiveValues(groups = vector())
   
@@ -147,7 +153,33 @@ server <- function(input, output, session){
     #   pull() %>% 
     #   print()
     
-    geoid_table_reactive()
+    var_name <- geoid_table_reactive() %>% 
+      distinct(variable) %>% 
+      pull()
+    
+    var_name_proper <- var_name %>% 
+      str_replace_all("_", " ") %>% 
+      str_to_title()
+    
+    table_df <- geoid_table_reactive() %>% 
+      select(-c(NAME, graph_type))
+    
+    table_df_names <- names(table_df) %>% 
+      str_replace("moe", "Margin of Error") %>%
+      str_replace("estimate", var_name) %>%
+      str_replace("census_year", "Census Year") %>% 
+      str_replace("year", "Year") %>%
+      str_replace(var_name, var_name_proper)
+    
+    names(table_df) <- table_df_names
+    
+    table_df %>% 
+      select(-variable) %>% 
+      DT::datatable(options = list(autoWidth = TRUE,
+                                   searching = FALSE,
+                                   lengthChange = FALSE,
+                                   pageLength = 5),
+                    filter = "none")
     
   })
   

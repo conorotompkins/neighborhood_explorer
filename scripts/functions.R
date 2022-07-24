@@ -61,12 +61,18 @@ make_graph <- function(graph_type, target_df){
 
 graph_point_in_time <- function(x){
   
+  var_name <- x %>% 
+    distinct(variable) %>% 
+    pull()
+  
   x %>% 
-    #mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
     ggplot(aes(y = GEOID)) +
     geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
     geom_point(aes(x = estimate), size = 2) +
-    theme_bw()
+    scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+    labs(x = var_name,
+         y = NULL) +
+    theme_bw(base_size = 14)
   
 }
 
