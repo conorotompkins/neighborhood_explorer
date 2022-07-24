@@ -153,7 +153,10 @@ server <- function(input, output, session){
     #   pull() %>% 
     #   print()
     
-    geoid_table_reactive()
+    geoid_table_reactive() %>% 
+      DT::datatable(options = list(autoWidth = TRUE,
+                                   searching = FALSE),
+                    filter = "none")
     
   })
   
