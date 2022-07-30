@@ -85,6 +85,7 @@ graph_time_series <- function(x){
   x %>% 
     ggplot(aes(x = year, y = estimate)) +
     geom_line(aes(group = GEOID), size = 2) +
+    scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
     labs(x = var_name,
          y = "Value") +
     theme_bw()
