@@ -26,7 +26,7 @@ ac_housing_hu <- ac_housing_hu %>%
   select(-year) %>% 
   rename(year = year_fixed,
          estimate = housing_units) %>% 
-  mutate(variable = "housing_units") %>% 
+  mutate(variable = "Estimated Housing Units") %>% 
   select(GEOID, variable, year, estimate) %>% 
   mutate(graph_type = "time_series",
          census_year = 2010)
