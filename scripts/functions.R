@@ -78,9 +78,16 @@ graph_point_in_time <- function(x){
 
 graph_time_series <- function(x){
   
+  var_name <- x %>% 
+    distinct(variable) %>% 
+    pull()
+  
   x %>% 
     ggplot(aes(x = year, y = estimate)) +
     geom_line(aes(group = GEOID), size = 2) +
+    scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+    labs(x = "Year",
+         y = var_name) +
     theme_bw()
   
 }
