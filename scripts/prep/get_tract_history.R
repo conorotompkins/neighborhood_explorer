@@ -14,7 +14,9 @@ ac_geo <- c(2010, 2020) %>%
       mutate(census_year = .x) %>% 
       select(census_year, GEOID, geometry)},
       .id = "census_year")
-  
+
+dir.create("inputs/allegheny_county_tract_history")
+
 ac_geo %>% 
   bind_rows() %>% 
   st_transform(4326) %>% 
