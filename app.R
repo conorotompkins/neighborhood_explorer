@@ -52,7 +52,7 @@ ui <- fluidPage(
            column(width = 6,
                   
                   plotlyOutput("bar_chart"),
-                  verbatimTextOutput("click")
+                  verbatimTextOutput("hover")
            )
          )
          
@@ -200,16 +200,16 @@ server <- function(input, output, session){
     
   })
   
-  plotly_click_event_reactive <- reactive({
+  plotly_hover_event_reactive <- reactive({
     
     req(geoid_table_reactive())
     
     event_data("plotly_hover")
   })
   
-  output$click <- renderPrint({
+  output$hover <- renderPrint({
     
-    plotly_click_event_reactive()
+    plotly_hover_event_reactive()
     
   })
   
