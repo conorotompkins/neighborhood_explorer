@@ -126,7 +126,7 @@ server <- function(input, output, session){
         #selected polygons
         addPolygons(data = selected_tracts_geo_reactive(),
                     fillColor = "yellow",
-                    fillOpacity = 0.9,
+                    fillOpacity = .5,
                     weight = 1,
                     color = "black",
                     stroke = TRUE,
@@ -164,6 +164,8 @@ server <- function(input, output, session){
                     semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")),
                   fillColor = "yellow",
                   fillOpacity = 1,
+                  color = "black",
+                  weight = 3,
                   label = ~GEOID,
                   group = "hover_polygon")
     
