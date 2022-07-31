@@ -201,6 +201,9 @@ server <- function(input, output, session){
   })
   
   plotly_click_event_reactive <- reactive({
+    
+    req(geoid_table_reactive())
+    
     event_data("plotly_hover")
   })
   
