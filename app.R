@@ -92,20 +92,8 @@ server <- function(input, output, session){
                   stroke = TRUE,
                   weight = 1,
                   layerId = ~NAME,
-                  group = "regions",
-                  label = ~NAME) %>%
-      #selected polygons
-      addPolygons(data = ac_tracts_reactive(),
-                  fillColor = "red",
-                  fillOpacity = 0.5,
-                  weight = 1,
-                  color = "black",
-                  stroke = TRUE,
-                  layerId = ~GEOID,
-                  group = ~GEOID,
-                  label = ~GEOID) %>%
-      #hide selected polygons at start
-      hideGroup(group = ac_tracts_reactive()$GEOID)
+                  group = "base_map",
+                  label = ~NAME)
   }) #END RENDER LEAFLET
   
   #define leaflet proxy for second regional level map
@@ -122,18 +110,44 @@ server <- function(input, output, session){
     
   })
   
+  selected_tracts_geo_reactive <- reactive({
+    
+    ac_tracts_reactive() %>% 
+      filter(GEOID %in% selected$groups)
+    
+  })
+  
   observeEvent(input$map_shape_click, {
     
-    if(input$map_shape_click$group == "regions"){
+    if(input$map_shape_click$group == "base_map"){
+      #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new layer
       selected$groups <- c(selected$groups, str_remove(input$map_shape_click$id, "^Tract ")) #remove "Tract " from start of id on the fly
-      proxy %>% showGroup(group = str_remove(input$map_shape_click$id, "^Tract "))
+      proxy %>%
+        #selected polygons
+        addPolygons(data = selected_tracts_geo_reactive(),
+                    fillColor = "yellow",
+                    fillOpacity = 0.9,
+                    weight = 1,
+                    color = "black",
+                    stroke = TRUE,
+                    layerId = ~GEOID,
+                    group = ~GEOID,
+                    label = ~GEOID)
+    } else if(input$map_shape_click$group == "hover_polygon") {
+      #when the user clicks on a tract that is highlighted by plotly already, do nothing
+      
+      NULL
+      
     } else {
+      #when the user clicks a tract that is already in selected$groups, remove that tract from selected$groups and remove it from the second layer
       selected$groups <- setdiff(selected$groups, input$map_shape_click$group)
-      proxy %>% hideGroup(group = input$map_shape_click$group)
+      
+      proxy %>% clearGroup(input$map_shape_click$group)
+      
     }
     print(selected$groups)
   }, ignoreInit = TRUE)
-
+  
   observeEvent(plotly_hover_event_reactive(), { 
     
     print(selected$groups)
