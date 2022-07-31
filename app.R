@@ -131,23 +131,29 @@ server <- function(input, output, session){
       selected$groups <- setdiff(selected$groups, input$map_shape_click$group)
       proxy %>% hideGroup(group = input$map_shape_click$group)
     }
-    # print(selected$groups)
+    print(selected$groups)
   }, ignoreInit = TRUE)
-  
+
   observeEvent(plotly_hover_event_reactive(), { 
-      
-      hover_GEOID <- plotly_hover_event_reactive() %>% 
-        pull(customdata)
-      
-      proxy %>% 
-        clearGroup("hover_polygon") %>% 
-        addPolygons(data = ac_tracts_reactive() %>% 
-                      filter(GEOID == hover_GEOID),
-                    fillColor = "yellow",
-                    fillOpacity = 1,
-                    group = "hover_polygon")
-      
-    })
+    
+    print(selected$groups)
+    
+    ac_tracts_reactive() %>% 
+      semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")) %>% 
+      st_drop_geometry() %>% 
+      as_tibble() %>% 
+      print()
+    
+    proxy %>% 
+      clearGroup("hover_polygon") %>% 
+      addPolygons(data = ac_tracts_reactive() %>% 
+                    semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")),
+                  fillColor = "yellow",
+                  fillOpacity = 1,
+                  label = ~GEOID,
+                  group = "hover_polygon")
+    
+  })
   
   geoid_table_reactive <- reactive({
     
@@ -223,6 +229,8 @@ server <- function(input, output, session){
   })
   
   output$hover <- renderPrint({
+    
+    req(plotly_hover_event_reactive())
     
     plotly_hover_event_reactive()
     
