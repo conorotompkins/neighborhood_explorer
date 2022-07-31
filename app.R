@@ -134,6 +134,21 @@ server <- function(input, output, session){
     # print(selected$groups)
   }, ignoreInit = TRUE)
   
+  observeEvent(plotly_hover_event_reactive(), { 
+      
+      hover_GEOID <- plotly_hover_event_reactive() %>% 
+        pull(customdata)
+      
+      proxy %>% 
+        clearGroup("hover_polygon") %>% 
+        addPolygons(data = ac_tracts_reactive() %>% 
+                      filter(GEOID == hover_GEOID),
+                    fillColor = "yellow",
+                    fillOpacity = 1,
+                    group = "hover_polygon")
+      
+    })
+  
   geoid_table_reactive <- reactive({
     
     req(length(selected$groups) > 0)
