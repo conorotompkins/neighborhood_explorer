@@ -188,7 +188,7 @@ server <- function(input, output, session){
   
   output$bar_chart <- renderPlotly({
     
-    req(geoid_table_reactive)
+    req(geoid_table_reactive())
     
     geoid_table_reactive() %>% 
       distinct(graph_type) %>% 
