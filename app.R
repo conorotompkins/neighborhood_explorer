@@ -101,7 +101,8 @@ server <- function(input, output, session){
                   color = "black",
                   stroke = TRUE,
                   layerId = ~GEOID,
-                  group = ~GEOID) %>%
+                  group = ~GEOID,
+                  label = ~GEOID) %>%
       #hide selected polygons at start
       hideGroup(group = ac_tracts_reactive()$GEOID)
   }) #END RENDER LEAFLET
