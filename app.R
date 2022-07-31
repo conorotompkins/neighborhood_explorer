@@ -4,6 +4,7 @@ library(shiny)
 library(leaflet)
 library(sf)
 library(DT)
+library(plotly)
 
 library(here)
 
@@ -50,7 +51,7 @@ ui <- fluidPage(
            
            column(width = 6,
                   
-                  plotOutput("bar_chart")
+                  plotlyOutput("bar_chart")
            )
          )
          
@@ -185,14 +186,15 @@ server <- function(input, output, session){
   
   
   
-  output$bar_chart <- renderPlot({
+  output$bar_chart <- renderPlotly({
     
     req(geoid_table_reactive)
     
     geoid_table_reactive() %>% 
       distinct(graph_type) %>% 
       pull() %>% 
-      make_graph(geoid_table_reactive())
+      make_graph(geoid_table_reactive()) %>% 
+      ggplotly()
     
   })
   
