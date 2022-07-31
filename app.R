@@ -51,7 +51,8 @@ ui <- fluidPage(
            
            column(width = 6,
                   
-                  plotlyOutput("bar_chart")
+                  plotlyOutput("bar_chart"),
+                  verbatimTextOutput("hover")
            )
          )
          
@@ -130,8 +131,29 @@ server <- function(input, output, session){
       selected$groups <- setdiff(selected$groups, input$map_shape_click$group)
       proxy %>% hideGroup(group = input$map_shape_click$group)
     }
-    # print(selected$groups)
+    print(selected$groups)
   }, ignoreInit = TRUE)
+
+  observeEvent(plotly_hover_event_reactive(), { 
+    
+    print(selected$groups)
+    
+    ac_tracts_reactive() %>% 
+      semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")) %>% 
+      st_drop_geometry() %>% 
+      as_tibble() %>% 
+      print()
+    
+    proxy %>% 
+      clearGroup("hover_polygon") %>% 
+      addPolygons(data = ac_tracts_reactive() %>% 
+                    semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")),
+                  fillColor = "yellow",
+                  fillOpacity = 1,
+                  label = ~GEOID,
+                  group = "hover_polygon")
+    
+  })
   
   geoid_table_reactive <- reactive({
     
@@ -196,6 +218,21 @@ server <- function(input, output, session){
       pull() %>% 
       make_graph(geoid_table_reactive()) %>% 
       ggplotly()
+    
+  })
+  
+  plotly_hover_event_reactive <- reactive({
+    
+    req(geoid_table_reactive())
+    
+    event_data("plotly_hover")
+  })
+  
+  output$hover <- renderPrint({
+    
+    req(plotly_hover_event_reactive())
+    
+    plotly_hover_event_reactive()
     
   })
   
