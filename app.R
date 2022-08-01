@@ -134,9 +134,9 @@ server <- function(input, output, session){
                     group = ~GEOID,
                     label = ~GEOID)
     } else if(input$map_shape_click$group == "hover_polygon") {
-      #when the user clicks on a tract that is highlighted by plotly already, do nothing
+      #when the user clicks on a tract that is highlighted by plotly already, clear that highlight polygon from the map
       
-      NULL
+      proxy %>% clearGroup("hover_polygon")
       
     } else {
       #when the user clicks a tract that is already in selected$groups, remove that tract from selected$groups and remove it from the second layer
