@@ -33,6 +33,22 @@ get_median_income <- function(x){
   
 }
 
+get_commute_modes <- function(x){
+  
+  here("inputs/data_sources/commute_modes.csv") %>% 
+    read_csv(col_types = cols(
+      GEOID = col_character(),
+      NAME = col_character(),
+      x_axis = col_character(),
+      variable = col_character(),
+      estimate = col_double(),
+      moe = col_double(),
+      census_year = col_double(),
+      graph_type = col_character()
+    ))
+  
+}
+
 # get_median_income() %>% 
 #   distinct(graph_type)
 
@@ -42,7 +58,8 @@ get_data <- function(x){
   
   switch(x,
          housing = get_housing_data(),
-         median_income = get_median_income()
+         median_income = get_median_income(),
+         commute_modes = get_commute_modes()
   )
   
 }
@@ -54,7 +71,8 @@ make_graph <- function(graph_type, target_df){
   
   switch(graph_type,
          point_in_time = graph_point_in_time(target_df),
-         time_series = graph_time_series(target_df)
+         time_series = graph_time_series(target_df),
+         discrete = graph_discrete(target_df)
   )
   
 }
@@ -88,6 +106,24 @@ graph_time_series <- function(x){
     scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
     labs(x = "Year",
          y = var_name) +
+    theme_bw()
+  
+}
+
+graph_discrete <- function(x){
+  
+  var_name <- x %>% 
+    distinct(x_axis) %>% 
+    pull()
+  
+  x %>% 
+    mutate(variable = str_remove(variable, "estimate!!total:!!"),
+           variable = fct_reorder(variable, estimate)) %>% 
+    ggplot(aes(x = estimate, y = variable, customdata = GEOID)) +
+    geom_col() +
+    scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+    labs(x = var_name,
+         y = NULL) +
     theme_bw()
   
 }
