@@ -10,20 +10,21 @@ acs1_vars <- load_variables(2019, 'acs1') %>%
 acs1_vars %>% 
   filter(str_detect(name, "B08301"))
 
-all_transit_vars <- c("B08301_003", 
-                      "B08301_004", 
-                      "B08301_010", 
-                      "B08301_016", 
-                      "B08301_017", 
-                      "B08301_018", 
-                      "B08301_019", 
-                      "B08301_020",
-                      "B08301_021")
+all_transit_vars <- c("Drove alone (car/truck/van)" = "B08301_003", 
+                      "Carpooled (car/truck/van)" = "B08301_004", 
+                      "Public transportation (excluding taxicab)" = "B08301_010", 
+                      "Taxicab" = "B08301_016", 
+                      "Motorcyle" = "B08301_017", 
+                      "Bicycle" = "B08301_018", 
+                      "Walked" = "B08301_019", 
+                      "Other means" = "B08301_020",
+                      "Worked from home" = "B08301_021")
+
+acs1_vars %>% 
+  filter(name %in% all_transit_vars)
 
 all_transit_modes <- get_acs(geography = "tract", 
-                             variables = acs1_vars %>%
-                               filter(name %in% all_transit_vars) %>%
-                               pull(name, label),
+                             variables = all_transit_vars,
                              summary_var = "B08301_001",
                              year = 2019, state = "PA", county = "Allegheny",
                              geometry = F) %>% 
