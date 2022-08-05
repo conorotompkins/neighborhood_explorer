@@ -27,9 +27,10 @@ all_transit_modes <- get_acs(geography = "tract",
                              summary_var = "B08301_001",
                              year = 2019, state = "PA", county = "Allegheny",
                              geometry = F) %>% 
-  mutate(x_axis = "Commuters",
+  rename(category = variable) %>% 
+  mutate(variable = "Commuters",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          census_year = 2010) %>% 
-  select(GEOID, NAME, x_axis, variable, estimate, moe, census_year, graph_type) %>% 
+  select(GEOID, NAME, variable, category, estimate, moe, census_year, graph_type) %>% 
   write_csv("inputs/data_sources/commute_modes.csv")
