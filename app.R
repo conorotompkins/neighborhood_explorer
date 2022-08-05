@@ -29,7 +29,7 @@ ui <- fluidPage(
            
            selectizeInput(inputId = "data_source",
                           label = "Choose topic",
-                          choices = c("median_income", "housing"))
+                          choices = c("median_income", "housing", "commute_modes"))
          ),
   ),
   
@@ -145,19 +145,10 @@ server <- function(input, output, session){
       proxy %>% clearGroup(input$map_shape_click$group)
       
     }
-    print(selected$groups)
   }, ignoreInit = TRUE)
   
   observeEvent(plotly_hover_event_reactive(), { 
-    
-    print(selected$groups)
-    
-    ac_tracts_reactive() %>% 
-      semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")) %>% 
-      st_drop_geometry() %>% 
-      as_tibble() %>% 
-      print()
-    
+
     proxy %>% 
       clearGroup("hover_polygon") %>% 
       addPolygons(data = ac_tracts_reactive() %>% 
@@ -187,12 +178,7 @@ server <- function(input, output, session){
   output$geoid_table <- DT::renderDataTable({
     
     req(geoid_table_reactive())
-    
-    # geoid_table_reactive() %>% 
-    #   distinct(graph_type) %>% 
-    #   pull() %>% 
-    #   print()
-    
+
     var_name <- geoid_table_reactive() %>% 
       distinct(variable) %>% 
       pull()
@@ -203,12 +189,13 @@ server <- function(input, output, session){
     
     table_df <- geoid_table_reactive() %>% 
       select(-c(NAME, graph_type))
-    
+
     table_df_names <- names(table_df) %>% 
       str_replace("moe", "Margin of Error") %>%
       str_replace("estimate", var_name) %>%
       str_replace("census_year", "Census Year") %>% 
       str_replace("year", "Year") %>%
+      str_replace("category", "Category") %>% 
       str_replace(var_name, var_name_proper)
     
     names(table_df) <- table_df_names
