@@ -121,9 +121,11 @@ graph_discrete <- function(x){
            variable = fct_reorder(variable, estimate)) %>% 
     ggplot(aes(x = estimate, y = variable, fill = GEOID, customdata = GEOID)) +
     geom_col(color = "black") +
+    facet_wrap(~GEOID, nrow = 1, scales = "free_x") +
     scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
     labs(x = var_name,
          y = NULL) +
+    guides(fill = "none") +
     theme_bw()
   
 }
