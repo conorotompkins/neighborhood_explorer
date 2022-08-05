@@ -195,6 +195,7 @@ server <- function(input, output, session){
       str_replace("estimate", var_name) %>%
       str_replace("census_year", "Census Year") %>% 
       str_replace("year", "Year") %>%
+      str_replace("category", "Category") %>% 
       str_replace(var_name, var_name_proper)
     
     names(table_df) <- table_df_names
