@@ -29,7 +29,7 @@ ui <- fluidPage(
            
            selectizeInput(inputId = "data_source",
                           label = "Choose topic",
-                          choices = c("median_income", "housing"))
+                          choices = c("median_income", "housing", "commute_modes"))
          ),
   ),
   
@@ -68,6 +68,8 @@ server <- function(input, output, session){
   })
   
   ac_tracts_reactive <- reactive({
+    
+    print(data_source_reactive())
     
     target_year <- data_source_reactive() %>% 
       distinct(census_year) %>% 
@@ -203,6 +205,8 @@ server <- function(input, output, session){
     
     table_df <- geoid_table_reactive() %>% 
       select(-c(NAME, graph_type))
+    
+    print(table_df)
     
     table_df_names <- names(table_df) %>% 
       str_replace("moe", "Margin of Error") %>%
