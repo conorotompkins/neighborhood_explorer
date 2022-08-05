@@ -43,20 +43,19 @@ ui <- fluidPage(
          
          fluidRow(
            
-           column(width = 6,
-                  
-                  DT::dataTableOutput("geoid_table")
-                  
-           ),
-           
-           column(width = 6,
-                  
-                  plotlyOutput("bar_chart"),
-                  verbatimTextOutput("hover")
+           tabsetPanel(
+             
+             tabPanel(title = "Graph",
+                      plotlyOutput("bar_chart")),
+             
+             tabPanel(title = "Table",
+                      DT::dataTableOutput("geoid_table"))
+             
            )
+           
          )
-         
   )
+  
 )
 
 server <- function(input, output, session){
@@ -148,7 +147,7 @@ server <- function(input, output, session){
   }, ignoreInit = TRUE)
   
   observeEvent(plotly_hover_event_reactive(), { 
-
+    
     proxy %>% 
       clearGroup("hover_polygon") %>% 
       addPolygons(data = ac_tracts_reactive() %>% 
@@ -178,7 +177,7 @@ server <- function(input, output, session){
   output$geoid_table <- DT::renderDataTable({
     
     req(geoid_table_reactive())
-
+    
     var_name <- geoid_table_reactive() %>% 
       distinct(variable) %>% 
       pull()
@@ -189,7 +188,7 @@ server <- function(input, output, session){
     
     table_df <- geoid_table_reactive() %>% 
       select(-c(NAME, graph_type))
-
+    
     table_df_names <- names(table_df) %>% 
       str_replace("moe", "Margin of Error") %>%
       str_replace("estimate", var_name) %>%
