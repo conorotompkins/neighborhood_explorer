@@ -117,9 +117,9 @@ graph_discrete <- function(x){
     pull()
   
   x %>% 
-    mutate(variable = str_remove(variable, "estimate!!total:!!"),
-           variable = fct_reorder(variable, estimate)) %>% 
-    ggplot(aes(x = estimate, y = variable, fill = GEOID, customdata = GEOID)) +
+    mutate(category = str_remove(category, "estimate!!total:!!"),
+           category = fct_reorder(category, estimate)) %>% 
+    ggplot(aes(x = estimate, y = category, fill = GEOID, customdata = GEOID)) +
     geom_col(color = "black") +
     facet_wrap(~GEOID, nrow = 1, scales = "free_x") +
     scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
