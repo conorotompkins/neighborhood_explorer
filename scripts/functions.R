@@ -39,8 +39,8 @@ get_commute_modes <- function(x){
     read_csv(col_types = cols(
       GEOID = col_character(),
       NAME = col_character(),
-      x_axis = col_character(),
       variable = col_character(),
+      category = col_character(),
       estimate = col_double(),
       moe = col_double(),
       census_year = col_double(),
@@ -113,7 +113,7 @@ graph_time_series <- function(x){
 graph_discrete <- function(x){
   
   var_name <- x %>% 
-    distinct(x_axis) %>% 
+    distinct(variable) %>% 
     pull()
   
   x %>% 
