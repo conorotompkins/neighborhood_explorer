@@ -23,15 +23,20 @@ all_transit_vars <- c("Drove alone (car/truck/van)" = "B08301_003",
 acs1_vars %>% 
   filter(name %in% all_transit_vars)
 
-all_transit_modes <- get_acs(geography = "tract", 
-                             variables = all_transit_vars,
-                             summary_var = "B08301_001",
-                             year = 2019, state = "PA", county = "Allegheny",
-                             geometry = F) %>% 
+c(2010:2019) %>% 
+  set_names() %>% 
+  map_dfr({~get_acs(geography = "tract", 
+                                         variables = all_transit_vars,
+                                         summary_var = "B08301_001",
+                                         year = .x,
+                                         state = "PA",
+                                         county = "Allegheny",
+                                         geometry = F)},
+      .id = "year") %>% 
   rename(category = variable) %>% 
   mutate(variable = "Commuters",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          census_year = 2010) %>% 
-  select(GEOID, NAME, variable, category, estimate, moe, census_year, graph_type) %>% 
+  select(GEOID, NAME, year, variable, category, estimate, moe, census_year) %>% 
   write_csv("inputs/data_sources/commute_modes.csv")
