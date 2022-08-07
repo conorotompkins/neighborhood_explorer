@@ -102,13 +102,24 @@ graph_single_year <- function(x){
            y = NULL) +
       theme_bw(base_size = 14)
     
-  } else {
+  } else if ("moe" %in% names(x)){
     
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
       geom_point(aes(x = estimate), size = 2) +
+      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = var_name,
+           y = NULL) +
+      theme_bw(base_size = 14)
+    
+  } else {
+    
+    x %>% 
+      mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
+      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      geom_col(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = var_name,
            y = NULL) +
