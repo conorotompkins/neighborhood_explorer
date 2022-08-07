@@ -39,12 +39,12 @@ get_commute_modes <- function(x){
     read_csv(col_types = cols(
       GEOID = col_character(),
       NAME = col_character(),
+      year = col_integer(),
       variable = col_character(),
       category = col_character(),
       estimate = col_double(),
       moe = col_double(),
-      census_year = col_double(),
-      graph_type = col_character()
+      census_year = col_double()
     ))
   
 }
