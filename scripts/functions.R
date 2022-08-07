@@ -91,12 +91,13 @@ graph_single_year <- function(x){
     distinct(variable) %>% 
     pull()
   
-  if ("category" %in% names(x)) {
+  if (all(c("category", "moe") %in% names(x))) {
     
     x %>% 
       ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
       geom_point(aes(x = estimate), size = 2) +
+      facet_wrap(~category, scales = "free_x") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = var_name,
            y = NULL) +
