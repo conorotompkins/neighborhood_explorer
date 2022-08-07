@@ -29,7 +29,13 @@ ui <- fluidPage(
            
            selectizeInput(inputId = "data_source",
                           label = "Choose topic",
-                          choices = c("median_income", "housing", "commute_modes"))
+                          choices = c("median_income", "housing", "commute_modes")),
+           
+           sliderInput(inputId = "year_slider",
+                       label = "Year",
+                       value = 2019,
+                       min = 2010,
+                       max = 2019)
          ),
   ),
   
@@ -65,6 +71,17 @@ server <- function(input, output, session){
     get_data(input$data_source)
     
   })
+  
+  observeEvent(data_source_reactive(), {
+    
+    updateSliderInput(inputId = "year_slider",
+                      value = max(data_source_reactive()$year),
+                      min = min(data_source_reactive()$year),
+                      max = max(data_source_reactive()$year))
+    
+  })
+  
+  
   
   ac_tracts_reactive <- reactive({
     
@@ -215,10 +232,10 @@ server <- function(input, output, session){
     
     req(geoid_table_reactive())
     
+    print(geoid_table_reactive())
+    
     geoid_table_reactive() %>% 
-      distinct(graph_type) %>% 
-      pull() %>% 
-      make_graph(geoid_table_reactive()) %>% 
+      make_graph() %>% 
       ggplotly()
     
   })
