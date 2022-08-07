@@ -72,15 +72,6 @@ server <- function(input, output, session){
     
   })
   
-  # filtered_data_source_reactive <- reactive({
-  #   
-  #   print(input$year_slider)
-  #   
-  #   data_source_reactive() %>% 
-  #     filter(between(year, input$year_slider[1], input$year_slider[2]))
-  #   
-  # })
-  
   observeEvent(data_source_reactive(), {
     
     year_min <- min(data_source_reactive()$year)
