@@ -139,11 +139,14 @@ graph_multiple_year <- function(x){
     distinct(year) %>% 
     pull()
   
-  if ("category" %in% names(x)) {
+  if (all(c("category", "moe") %in% names(x))) {
     
     x %>% 
-      ggplot(aes(x = year, y = estimate, customdata = GEOID)) +
-      geom_line(aes(group = GEOID), size = 2) +
+      mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
+      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
+      geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
+      geom_line() +
+      geom_point(size = 1.5) +
       facet_wrap(~category, scales = "free_y") +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = "Year",
@@ -154,7 +157,6 @@ graph_multiple_year <- function(x){
     
     x %>% 
       ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
-      geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
       geom_line(size = 1) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
