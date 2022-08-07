@@ -150,6 +150,19 @@ graph_multiple_year <- function(x){
            y = var_name) +
       theme_bw()
     
+  } else if ("moe" %in% names(x)){
+    
+    x %>% 
+      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
+      geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
+      geom_line(size = 1) +
+      geom_point(size = 2) +
+      scale_x_continuous(breaks = custom_breaks) +
+      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = "Year",
+           y = var_name) +
+      theme_bw()
+    
   } else {
     
     x %>% 
