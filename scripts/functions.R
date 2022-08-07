@@ -23,11 +23,11 @@ get_median_income <- function(x){
   here("inputs/data_sources/median_income.csv") %>% 
     read_csv(col_types = cols(
       GEOID = col_character(),
+      year = col_integer(),
       variable = col_character(),
       estimate = col_double(),
       moe = col_double(),
       NAME = col_character(),
-      graph_type = col_character(),
       census_year = col_double()
     ))
   
