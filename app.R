@@ -35,7 +35,8 @@ ui <- fluidPage(
                        label = "Year",
                        value = c(2010, 2019),
                        min = 2010,
-                       max = 2019)
+                       max = 2019,
+                       sep = "")
          ),
   ),
   
