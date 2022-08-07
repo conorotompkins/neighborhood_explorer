@@ -16,5 +16,5 @@ c(2010:2019) %>%
              graph_type = "point_in_time",
              census_year = 2020)},
       .id = "year") %>% 
-  select(GEOID, year, variable, estimate, moe) %>% 
+  select(GEOID, NAME, year, variable, estimate, moe, census_year) %>% 
   write_csv("inputs/data_sources/median_income.csv")
