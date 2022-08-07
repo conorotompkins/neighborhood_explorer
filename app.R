@@ -33,7 +33,7 @@ ui <- fluidPage(
            
            sliderInput(inputId = "year_slider",
                        label = "Year",
-                       value = 2019,
+                       value = c(2010, 2019),
                        min = 2010,
                        max = 2019)
          ),
@@ -72,12 +72,27 @@ server <- function(input, output, session){
     
   })
   
+  # filtered_data_source_reactive <- reactive({
+  #   
+  #   print(input$year_slider)
+  #   
+  #   data_source_reactive() %>% 
+  #     filter(between(year, input$year_slider[1], input$year_slider[2]))
+  #   
+  # })
+  
   observeEvent(data_source_reactive(), {
     
+    year_min <- min(data_source_reactive()$year)
+    year_max <- max(data_source_reactive()$year)
+    
+    print(year_min)
+    print(year_max)
+    
     updateSliderInput(inputId = "year_slider",
-                      value = max(data_source_reactive()$year),
-                      min = min(data_source_reactive()$year),
-                      max = max(data_source_reactive()$year))
+                      value = c(year_min, year_max),
+                      min = year_min,
+                      max = year_max)
     
   })
   
@@ -187,7 +202,8 @@ server <- function(input, output, session){
       select(-name) %>% 
       left_join(st_drop_geometry(ac_tracts_reactive()), by = "GEOID") %>% 
       select(NAME, GEOID) %>% 
-      left_join(get_data(input$data_source))
+      left_join(data_source_reactive()) %>% 
+      filter(between(year, input$year_slider[1], input$year_slider[2]))
     
   })
   
