@@ -105,6 +105,7 @@ graph_single_year <- function(x){
   } else {
     
     x %>% 
+      mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
       geom_point(aes(x = estimate), size = 2) +
