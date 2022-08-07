@@ -9,7 +9,6 @@ get_housing_data <- function(){
       variable = col_character(),
       year = col_double(),
       estimate = col_double(),
-      graph_type = col_character(),
       census_year = col_double()
     ))
   
