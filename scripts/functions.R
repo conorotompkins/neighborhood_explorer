@@ -124,6 +124,10 @@ graph_multiple_year <- function(x){
     distinct(variable) %>% 
     pull()
   
+  custom_breaks <- x %>% 
+    distinct(year) %>% 
+    pull()
+  
   if ("category" %in% names(x)) {
     
     x %>% 
@@ -138,8 +142,10 @@ graph_multiple_year <- function(x){
   } else {
     
     x %>% 
-      ggplot(aes(x = year, y = estimate, customdata = GEOID)) +
-      geom_line(aes(group = GEOID), size = 2) +
+      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
+      geom_line(size = 1) +
+      geom_point(size = 2) +
+      scale_x_continuous(breaks = custom_breaks) +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = "Year",
            y = var_name) +
