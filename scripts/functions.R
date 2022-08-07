@@ -67,64 +67,82 @@ get_data <- function(x){
 #get_data("housing")
 #get_data("median_income")
 
-make_graph <- function(graph_type, target_df){
+make_graph <- function(target_df){
+  
+  graph_type <- target_df %>% 
+    distinct(year) %>% 
+    count() %>% 
+    mutate(graph_type = case_when(n == 1 ~ "single_year",
+                                  n > 1 ~ "multiple_year")) %>% 
+    pull(graph_type)
   
   switch(graph_type,
-         point_in_time = graph_point_in_time(target_df),
-         time_series = graph_time_series(target_df),
-         discrete = graph_discrete(target_df)
+         single_year = graph_single_year(target_df),
+         multiple_years = graph_multiple_years(target_df)
   )
   
 }
 
-graph_point_in_time <- function(x){
+graph_single_year <- function(x){
   
   var_name <- x %>% 
     distinct(variable) %>% 
     pull()
   
-  x %>% 
-    ggplot(aes(y = GEOID, customdata = GEOID)) +
-    geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
-    geom_point(aes(x = estimate), size = 2) +
-    scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
-    labs(x = var_name,
-         y = NULL) +
-    theme_bw(base_size = 14)
+  if ("category" %in% names(x)) {
+    
+    x %>% 
+      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+      geom_point(aes(x = estimate), size = 2) +
+      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = var_name,
+           y = NULL) +
+      theme_bw(base_size = 14)
+    
+  } else {
+    
+    x %>% 
+      ggplot(aes(y = category, customdata = GEOID)) +
+      geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+      geom_point(aes(x = estimate), size = 2) +
+      facet_wrap(~GEOID, scales = "free_x") +
+      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = var_name,
+           y = NULL) +
+      theme_bw(base_size = 14)
+    
+  }
   
 }
 
-graph_time_series <- function(x){
+graph_multiple_years <- function(x){
   
   var_name <- x %>% 
     distinct(variable) %>% 
     pull()
   
-  x %>% 
-    ggplot(aes(x = year, y = estimate, customdata = GEOID)) +
-    geom_line(aes(group = GEOID), size = 2) +
-    scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
-    labs(x = "Year",
-         y = var_name) +
-    theme_bw()
-  
-}
-
-graph_discrete <- function(x){
-  
-  var_name <- x %>% 
-    distinct(variable) %>% 
-    pull()
-  
-  x %>% 
-    mutate(category = fct_reorder(category, estimate, sum)) %>% 
-    ggplot(aes(x = estimate, y = category, fill = GEOID, customdata = GEOID)) +
-    geom_col(color = "black") +
-    facet_wrap(~GEOID, nrow = 1, scales = "free_x") +
-    scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
-    labs(x = var_name,
-         y = NULL) +
-    guides(fill = "none") +
-    theme_bw()
+  if ("category" %in% names(x)) {
+    
+    x %>% 
+      ggplot(aes(x = year, y = estimate, customdata = GEOID)) +
+      geom_line(aes(group = GEOID), size = 2) +
+      facet_wrap(~category, scales = "free_y") +
+      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = "Year",
+           y = var_name) +
+      theme_bw()
+    
+  } else {
+    
+    x %>% 
+      ggplot(aes(x = year, y = estimate, customdata = GEOID)) +
+      geom_line(aes(group = GEOID), size = 2) +
+      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = "Year",
+           y = var_name) +
+      theme_bw()
+    
+  }
   
 }
