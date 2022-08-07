@@ -77,13 +77,16 @@ server <- function(input, output, session){
     year_min <- min(data_source_reactive()$year)
     year_max <- max(data_source_reactive()$year)
     
+    year_step <- ifelse(year_min == 1940, 10, 1)
+    
     print(year_min)
     print(year_max)
     
     updateSliderInput(inputId = "year_slider",
                       value = c(year_min, year_max),
                       min = year_min,
-                      max = year_max)
+                      max = year_max,
+                      step = year_step)
     
   })
   
