@@ -105,10 +105,9 @@ graph_single_year <- function(x){
   } else {
     
     x %>% 
-      ggplot(aes(y = category, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
       geom_point(aes(x = estimate), size = 2) +
-      facet_wrap(~GEOID, scales = "free_x") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = var_name,
            y = NULL) +
