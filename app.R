@@ -220,7 +220,7 @@ server <- function(input, output, session){
       str_to_title()
     
     table_df <- geoid_table_reactive() %>% 
-      select(-c(NAME, graph_type))
+      select(-c(NAME))
     
     table_df_names <- names(table_df) %>% 
       str_replace("moe", "Margin of Error") %>%
