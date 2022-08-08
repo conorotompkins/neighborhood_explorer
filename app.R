@@ -258,7 +258,8 @@ server <- function(input, output, session){
     
     x %>% 
       make_graph() %>% 
-      ggplotly()
+      ggplotly() %>% 
+      highlight(on = "plotly_hover", off = "plotly_doubleclick")
     
   })
   
