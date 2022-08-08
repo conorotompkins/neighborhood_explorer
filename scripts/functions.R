@@ -1,5 +1,6 @@
 library(tidyverse)
 library(here)
+library(plotly)
 
 get_housing_data <- function(){
   
@@ -94,6 +95,7 @@ graph_single_year <- function(x){
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
+      highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
@@ -107,6 +109,7 @@ graph_single_year <- function(x){
     
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
+      highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
@@ -119,6 +122,7 @@ graph_single_year <- function(x){
     
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
+      highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_col(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
@@ -144,6 +148,7 @@ graph_multiple_year <- function(x){
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
+      highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
       geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
       geom_line() +
@@ -157,6 +162,7 @@ graph_multiple_year <- function(x){
   } else if ("moe" %in% names(x)){
     
     x %>% 
+      highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, group = GEOID, customdata = GEOID)) +
       geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
       geom_line(aes(y = estimate), size = 1) +
@@ -170,6 +176,7 @@ graph_multiple_year <- function(x){
   } else {
     
     x %>% 
+      highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
