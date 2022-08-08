@@ -29,7 +29,14 @@ ui <- fluidPage(
            
            selectizeInput(inputId = "data_source",
                           label = "Choose topic",
-                          choices = c("median_income", "housing", "commute_modes"))
+                          choices = c("median_income", "housing", "commute_modes")),
+           
+           sliderInput(inputId = "year_slider",
+                       label = "Year",
+                       value = c(2010, 2019),
+                       min = 2010,
+                       max = 2019,
+                       sep = "")
          ),
   ),
   
@@ -65,6 +72,26 @@ server <- function(input, output, session){
     get_data(input$data_source)
     
   })
+  
+  observeEvent(data_source_reactive(), {
+    
+    year_min <- min(data_source_reactive()$year)
+    year_max <- max(data_source_reactive()$year)
+    
+    year_step <- ifelse(year_min == 1940, 10, 1)
+    
+    print(year_min)
+    print(year_max)
+    
+    updateSliderInput(inputId = "year_slider",
+                      value = c(year_min, year_max),
+                      min = year_min,
+                      max = year_max,
+                      step = year_step)
+    
+  })
+  
+  
   
   ac_tracts_reactive <- reactive({
     
@@ -170,7 +197,8 @@ server <- function(input, output, session){
       select(-name) %>% 
       left_join(st_drop_geometry(ac_tracts_reactive()), by = "GEOID") %>% 
       select(NAME, GEOID) %>% 
-      left_join(get_data(input$data_source))
+      left_join(data_source_reactive()) %>% 
+      filter(between(year, input$year_slider[1], input$year_slider[2]))
     
   })
   
@@ -187,7 +215,7 @@ server <- function(input, output, session){
       str_to_title()
     
     table_df <- geoid_table_reactive() %>% 
-      select(-c(NAME, graph_type))
+      select(-c(NAME))
     
     table_df_names <- names(table_df) %>% 
       str_replace("moe", "Margin of Error") %>%
@@ -215,10 +243,10 @@ server <- function(input, output, session){
     
     req(geoid_table_reactive())
     
+    print(geoid_table_reactive())
+    
     geoid_table_reactive() %>% 
-      distinct(graph_type) %>% 
-      pull() %>% 
-      make_graph(geoid_table_reactive()) %>% 
+      make_graph() %>% 
       ggplotly()
     
   })

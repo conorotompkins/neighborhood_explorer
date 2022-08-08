@@ -9,7 +9,6 @@ get_housing_data <- function(){
       variable = col_character(),
       year = col_double(),
       estimate = col_double(),
-      graph_type = col_character(),
       census_year = col_double()
     ))
   
@@ -23,11 +22,11 @@ get_median_income <- function(x){
   here("inputs/data_sources/median_income.csv") %>% 
     read_csv(col_types = cols(
       GEOID = col_character(),
+      year = col_integer(),
       variable = col_character(),
       estimate = col_double(),
       moe = col_double(),
       NAME = col_character(),
-      graph_type = col_character(),
       census_year = col_double()
     ))
   
@@ -39,12 +38,12 @@ get_commute_modes <- function(x){
     read_csv(col_types = cols(
       GEOID = col_character(),
       NAME = col_character(),
+      year = col_integer(),
       variable = col_character(),
       category = col_character(),
       estimate = col_double(),
       moe = col_double(),
-      census_year = col_double(),
-      graph_type = col_character()
+      census_year = col_double()
     ))
   
 }
@@ -67,64 +66,117 @@ get_data <- function(x){
 #get_data("housing")
 #get_data("median_income")
 
-make_graph <- function(graph_type, target_df){
+make_graph <- function(target_df){
+  
+  graph_type <- target_df %>% 
+    distinct(year) %>% 
+    count() %>% 
+    mutate(graph_type = case_when(n == 1 ~ "single_year",
+                                  n > 1 ~ "multiple_year")) %>% 
+    pull(graph_type)
+  
+  print(graph_type)
   
   switch(graph_type,
-         point_in_time = graph_point_in_time(target_df),
-         time_series = graph_time_series(target_df),
-         discrete = graph_discrete(target_df)
+         single_year = graph_single_year(target_df),
+         multiple_year = graph_multiple_year(target_df)
   )
   
 }
 
-graph_point_in_time <- function(x){
+graph_single_year <- function(x){
   
   var_name <- x %>% 
     distinct(variable) %>% 
     pull()
   
-  x %>% 
-    ggplot(aes(y = GEOID, customdata = GEOID)) +
-    geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
-    geom_point(aes(x = estimate), size = 2) +
-    scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
-    labs(x = var_name,
-         y = NULL) +
-    theme_bw(base_size = 14)
+  if (all(c("category", "moe") %in% names(x))) {
+    
+    x %>% 
+      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+      geom_point(aes(x = estimate), size = 2) +
+      facet_wrap(~category, scales = "free_x") +
+      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = var_name,
+           y = NULL) +
+      theme_bw(base_size = 14)
+    
+  } else if ("moe" %in% names(x)){
+    
+    x %>% 
+      mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
+      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      geom_errorbar(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+      geom_point(aes(x = estimate), size = 2) +
+      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = var_name,
+           y = NULL) +
+      theme_bw(base_size = 14)
+    
+  } else {
+    
+    x %>% 
+      mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
+      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      geom_col(aes(x = estimate), size = 2) +
+      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = var_name,
+           y = NULL) +
+      theme_bw(base_size = 14)
+    
+  }
   
 }
 
-graph_time_series <- function(x){
+graph_multiple_year <- function(x){
   
   var_name <- x %>% 
     distinct(variable) %>% 
     pull()
   
-  x %>% 
-    ggplot(aes(x = year, y = estimate, customdata = GEOID)) +
-    geom_line(aes(group = GEOID), size = 2) +
-    scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
-    labs(x = "Year",
-         y = var_name) +
-    theme_bw()
-  
-}
-
-graph_discrete <- function(x){
-  
-  var_name <- x %>% 
-    distinct(variable) %>% 
+  custom_breaks <- x %>% 
+    distinct(year) %>% 
     pull()
   
-  x %>% 
-    mutate(category = fct_reorder(category, estimate, sum)) %>% 
-    ggplot(aes(x = estimate, y = category, fill = GEOID, customdata = GEOID)) +
-    geom_col(color = "black") +
-    facet_wrap(~GEOID, nrow = 1, scales = "free_x") +
-    scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
-    labs(x = var_name,
-         y = NULL) +
-    guides(fill = "none") +
-    theme_bw()
+  if (all(c("category", "moe") %in% names(x))) {
+    
+    x %>% 
+      mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
+      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
+      geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
+      geom_line() +
+      geom_point(size = 1.5) +
+      facet_wrap(~category, scales = "free_y") +
+      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = "Year",
+           y = var_name) +
+      theme_bw()
+    
+  } else if ("moe" %in% names(x)){
+    
+    x %>% 
+      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
+      geom_line(size = 1) +
+      geom_point(size = 2) +
+      scale_x_continuous(breaks = custom_breaks) +
+      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = "Year",
+           y = var_name) +
+      theme_bw()
+    
+  } else {
+    
+    x %>% 
+      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
+      geom_line(size = 1) +
+      geom_point(size = 2) +
+      scale_x_continuous(breaks = custom_breaks) +
+      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      labs(x = "Year",
+           y = var_name) +
+      theme_bw()
+    
+  }
   
 }
