@@ -256,8 +256,6 @@ server <- function(input, output, session){
     
   }
     
-    print(x)
-    
     x %>% 
       make_graph() %>% 
       ggplotly()
