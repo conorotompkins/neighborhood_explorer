@@ -96,13 +96,14 @@ graph_single_year <- function(x){
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
       facet_wrap(~category, scales = "free_x") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = var_name,
            y = NULL) +
+      guides(color = "none") +
       theme_bw(base_size = 14)
     
   } else if ("moe" %in% names(x)){
@@ -110,12 +111,14 @@ graph_single_year <- function(x){
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, color = GEOID, fill = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = var_name,
            y = NULL) +
+      guides(color = "none",
+             fill = "none") +
       theme_bw(base_size = 14)
     
   } else {
@@ -123,11 +126,13 @@ graph_single_year <- function(x){
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(y = GEOID, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID)) +
       geom_col(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = var_name,
            y = NULL) +
+      guides(color = "none",
+             fill = "none") +
       theme_bw(base_size = 14)
     
   }
@@ -149,41 +154,46 @@ graph_multiple_year <- function(x){
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
-      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
+      ggplot(aes(x = year, y = estimate, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID)) +
+      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
       geom_line() +
       geom_point(size = 1.5) +
       facet_wrap(~category, scales = "free_y") +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = "Year",
            y = var_name) +
+      guides(color = "none",
+             fill = "none") +
       theme_bw()
     
   } else if ("moe" %in% names(x)){
     
     x %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, group = GEOID, customdata = GEOID)) +
-      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
+      ggplot(aes(x = year, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID)) +
+      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
       geom_line(aes(y = estimate), size = 1) +
       geom_point(aes(y = estimate), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = "Year",
            y = var_name) +
+      guides(color = "none",
+             fill = "none") +
       theme_bw()
     
   } else {
     
     x %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, y = estimate, group = GEOID, customdata = GEOID)) +
+      ggplot(aes(x = year, y = estimate, color = GEOID, group = GEOID, customdata = GEOID)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       labs(x = "Year",
            y = var_name) +
+      guides(color = "none") +
       theme_bw()
     
   }
