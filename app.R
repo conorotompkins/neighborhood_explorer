@@ -243,9 +243,22 @@ server <- function(input, output, session){
     
     req(geoid_table_reactive())
     
-    print(geoid_table_reactive())
+    if ("moe" %in% names(geoid_table_reactive())) {
     
-    geoid_table_reactive() %>% 
+    x <- geoid_table_reactive() %>% 
+      mutate(lower_bound = estimate - moe,
+             upper_bound = estimate + moe,
+             lower_bound = case_when(lower_bound < 0 ~ 0,
+                                     lower_bound >= 0 ~ lower_bound))
+  } else {
+    
+    x <- geoid_table_reactive()
+    
+  }
+    
+    print(x)
+    
+    x %>% 
       make_graph() %>% 
       ggplotly()
     
