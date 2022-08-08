@@ -155,7 +155,7 @@ graph_multiple_year <- function(x){
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, y = estimate, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID)) +
-      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
+      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
       geom_line() +
       geom_point(size = 1.5) +
       facet_wrap(~category, scales = "free_y") +
@@ -171,7 +171,7 @@ graph_multiple_year <- function(x){
     x %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID)) +
-      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
+      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
       geom_line(aes(y = estimate), size = 1) +
       geom_point(aes(y = estimate), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
