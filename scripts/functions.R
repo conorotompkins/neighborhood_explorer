@@ -93,6 +93,7 @@ graph_single_year <- function(x){
   if (all(c("category", "moe") %in% names(x))) {
     
     x %>% 
+      mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       ggplot(aes(y = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
