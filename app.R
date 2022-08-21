@@ -22,13 +22,17 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
-  column(width = 2,
-         
-         fluidRow(
+  fluidRow(
+    
+    column(width = 2,
            
            selectizeInput(inputId = "data_source",
                           label = "Choose topic",
-                          choices = c("median_income", "housing", "commute_modes")),
+                          choices = c("median_income", "housing", "commute_modes"))
+           
+    ),
+    
+    column(width = 3,
            
            sliderInput(inputId = "year_slider",
                        label = "Year",
@@ -36,7 +40,7 @@ ui <- fluidPage(
                        min = 2010,
                        max = 2019,
                        sep = "")
-         ),
+    )
   ),
   
   column(width = 10,
@@ -96,7 +100,7 @@ server <- function(input, output, session){
   })
   
   ac_tracts_reactive <- reactive({
-
+    
     ac_geo %>% 
       filter(tract_year == tract_year_reactive())
     
@@ -241,17 +245,17 @@ server <- function(input, output, session){
     req(geoid_table_reactive())
     
     if ("moe" %in% names(geoid_table_reactive())) {
-    
-    x <- geoid_table_reactive() %>% 
-      mutate(lower_bound = estimate - moe,
-             upper_bound = estimate + moe,
-             lower_bound = case_when(lower_bound < 0 ~ 0,
-                                     lower_bound >= 0 ~ lower_bound))
-  } else {
-    
-    x <- geoid_table_reactive()
-    
-  }
+      
+      x <- geoid_table_reactive() %>% 
+        mutate(lower_bound = estimate - moe,
+               upper_bound = estimate + moe,
+               lower_bound = case_when(lower_bound < 0 ~ 0,
+                                       lower_bound >= 0 ~ lower_bound))
+    } else {
+      
+      x <- geoid_table_reactive()
+      
+    }
     
     x %>% 
       make_graph() %>% 
