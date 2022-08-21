@@ -14,7 +14,7 @@ c(2010:2019) %>%
                 geometry = F) %>%
       mutate(NAME = str_c("Tract", GEOID, sep = " "),
              graph_type = "point_in_time",
-             census_year = 2010)},
+             tract_year = 2010)},
       .id = "year") %>% 
-  select(GEOID, NAME, year, variable, estimate, moe, census_year) %>% 
+  select(GEOID, NAME, year, variable, estimate, moe, tract_year) %>% 
   write_csv("inputs/data_sources/median_income.csv")

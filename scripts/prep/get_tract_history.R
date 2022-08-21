@@ -11,9 +11,11 @@ ac_geo <- c(2010, 2020) %>%
                variables = c(medincome = "B19013_001"),
                year = .x,
                geometry = T) %>% 
-      mutate(census_year = .x) %>% 
-      select(census_year, GEOID, geometry)},
-      .id = "census_year")
+      mutate(tract_year = .x) %>% 
+      select(tract_year, GEOID, geometry)},
+      .id = "tract_year")
+
+unlink("inputs/allegheny_county_tract_history", recursive = T)
 
 dir.create("inputs/allegheny_county_tract_history")
 

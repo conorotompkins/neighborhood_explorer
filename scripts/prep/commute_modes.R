@@ -37,6 +37,6 @@ c(2010:2019) %>%
   mutate(variable = "Commuters",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
-         census_year = 2010) %>% 
-  select(GEOID, NAME, year, variable, category, estimate, moe, census_year) %>% 
+         tract_year = 2010) %>% 
+  select(GEOID, NAME, year, variable, category, estimate, moe, tract_year) %>% 
   write_csv("inputs/data_sources/commute_modes.csv")
