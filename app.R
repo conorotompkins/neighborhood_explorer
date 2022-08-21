@@ -79,9 +79,6 @@ server <- function(input, output, session){
     
     year_step <- ifelse(year_min == 1940, 10, 1)
     
-    print(year_min)
-    print(year_max)
-    
     updateSliderInput(inputId = "year_slider",
                       value = c(year_min, year_max),
                       min = year_min,
@@ -90,16 +87,18 @@ server <- function(input, output, session){
     
   })
   
-  
-  
-  ac_tracts_reactive <- reactive({
+  tract_year_reactive <- reactive({
     
-    target_year <- data_source_reactive() %>% 
+    isolate(data_source_reactive()) %>% 
       distinct(tract_year) %>% 
       pull()
     
+  })
+  
+  ac_tracts_reactive <- reactive({
+
     ac_geo %>% 
-      filter(tract_year == target_year)
+      filter(tract_year == tract_year_reactive())
     
   })
   
@@ -127,9 +126,8 @@ server <- function(input, output, session){
   #create empty vector to hold all click ids
   selected <- reactiveValues(groups = vector())
   
-  #reset selected tracts when data source changes
-  #eventually needs to only change when census tract year changes
-  observeEvent(input$data_source, {
+  #reset selected tracts when tract_year changes
+  observeEvent(tract_year_reactive(), {
     
     selected$groups <- NULL
     

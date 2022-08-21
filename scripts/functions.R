@@ -76,8 +76,6 @@ make_graph <- function(target_df){
                                   n > 1 ~ "multiple_year")) %>% 
     pull(graph_type)
   
-  print(graph_type)
-  
   switch(graph_type,
          single_year = graph_single_year(target_df),
          multiple_year = graph_multiple_year(target_df)
