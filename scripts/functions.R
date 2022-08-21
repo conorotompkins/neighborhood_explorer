@@ -10,7 +10,7 @@ get_housing_data <- function(){
       variable = col_character(),
       year = col_double(),
       estimate = col_double(),
-      census_year = col_double()
+      tract_year = col_double()
     ))
   
 }
@@ -28,7 +28,7 @@ get_median_income <- function(x){
       estimate = col_double(),
       moe = col_double(),
       NAME = col_character(),
-      census_year = col_double()
+      tract_year = col_double()
     ))
   
 }
@@ -44,7 +44,7 @@ get_commute_modes <- function(x){
       category = col_character(),
       estimate = col_double(),
       moe = col_double(),
-      census_year = col_double()
+      tract_year = col_double()
     ))
   
 }

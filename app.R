@@ -17,8 +17,7 @@ source(here("scripts/functions.R"))
 #https://stackoverflow.com/questions/65893124/select-multiple-items-using-map-click-in-leaflet-linked-to-selectizeinput-in
 
 #load shapefile
-ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_history.shp") %>% 
-  rename(census_year = cnss_yr) %>% 
+ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_history.shp") %>%
   mutate(NAME = str_c("Tract", GEOID, sep = " ")) #needs to be different than only GEOID value
 
 ui <- fluidPage(
@@ -96,11 +95,11 @@ server <- function(input, output, session){
   ac_tracts_reactive <- reactive({
     
     target_year <- data_source_reactive() %>% 
-      distinct(census_year) %>% 
+      distinct(tract_year) %>% 
       pull()
     
     ac_geo %>% 
-      filter(census_year == target_year)
+      filter(tract_year == target_year)
     
   })
   
@@ -220,7 +219,7 @@ server <- function(input, output, session){
     table_df_names <- names(table_df) %>% 
       str_replace("moe", "Margin of Error") %>%
       str_replace("estimate", var_name) %>%
-      str_replace("census_year", "Census Year") %>% 
+      str_replace("tract_year", "Census Year") %>% 
       str_replace("year", "Year") %>%
       str_replace("category", "Category") %>% 
       str_replace(var_name, var_name_proper)
