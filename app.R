@@ -122,6 +122,14 @@ server <- function(input, output, session){
   })
   
   #create empty vector to hold all click ids
+  selected <- reactiveValues(groups = vector())
+  
+  #reset selected tracts when tract_year changes
+  observeEvent(tract_year_reactive(), {
+    
+    selected$groups <- NULL
+    
+  })
   
   #initial map output
   output$map <- renderLeaflet({
@@ -141,16 +149,6 @@ server <- function(input, output, session){
   
   #define leaflet proxy for second regional level map
   proxy <- leafletProxy("map")
-  
-  #create empty vector to hold all click ids
-  selected <- reactiveValues(groups = vector())
-  
-  #reset selected tracts when tract_year changes
-  observeEvent(tract_year_reactive(), {
-    
-    selected$groups <- NULL
-    
-  })
   
   selected_tracts_geo_reactive <- reactive({
     
