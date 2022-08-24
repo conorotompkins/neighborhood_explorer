@@ -69,6 +69,21 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session){
+
+  #modal at start
+  observeEvent(1, {
+    
+    showModal(
+      
+      modalDialog(
+        
+        title = "Tip",
+        "Click on census tracts to start!"
+        
+      )
+    )
+    
+  })
   
   data_source_reactive <- reactive({
     
