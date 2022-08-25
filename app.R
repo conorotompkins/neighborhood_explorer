@@ -5,6 +5,7 @@ library(leaflet)
 library(sf)
 library(DT)
 library(plotly)
+library(scales)
 
 library(here)
 
@@ -157,16 +158,32 @@ server <- function(input, output, session){
     
   })
   
-  observeEvent(input$map_shape_click, {
+  #set up palette
+  tract_count <- reactive({
+    
+    length(selected$groups)
+    
+  })
+  
+  palette_reactive <- reactive({
+    
+    hue_pal()(tract_count())
+    
+  })
+  
+    observeEvent(input$map_shape_click, {
     
     if(input$map_shape_click$group == "base_map"){
       #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new layer
       selected$groups <- c(selected$groups, str_remove(input$map_shape_click$id, "^Tract ")) #remove "Tract " from start of id on the fly
+      
+      leaflet_pal <- colorFactor(palette_reactive(), selected_tracts_geo_reactive()$GEOID)
+      
       proxy %>%
         #selected polygons
         addPolygons(data = selected_tracts_geo_reactive(),
-                    fillColor = "yellow",
-                    fillOpacity = .5,
+                    fillColor = ~leaflet_pal(GEOID),
+                    fillOpacity = .9,
                     weight = 1,
                     color = "black",
                     stroke = TRUE,
@@ -271,7 +288,7 @@ server <- function(input, output, session){
     }
     
     x %>% 
-      make_graph() %>% 
+      make_graph(custom_palette = palette_reactive()) %>% 
       ggplotly() %>% 
       highlight(on = "plotly_hover", off = "plotly_doubleclick")
     
