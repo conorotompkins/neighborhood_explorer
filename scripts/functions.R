@@ -67,7 +67,7 @@ get_data <- function(x){
 #get_data("housing")
 #get_data("median_income")
 
-make_graph <- function(target_df){
+make_graph <- function(target_df, custom_palette){
   
   graph_type <- target_df %>% 
     distinct(year) %>% 
@@ -77,13 +77,13 @@ make_graph <- function(target_df){
     pull(graph_type)
   
   switch(graph_type,
-         single_year = graph_single_year(target_df),
-         multiple_year = graph_multiple_year(target_df)
+         single_year = graph_single_year(target_df, custom_palette),
+         multiple_year = graph_multiple_year(target_df, custom_palette)
   )
   
 }
 
-graph_single_year <- function(x){
+graph_single_year <- function(x, custom_palette){
   
   var_name <- x %>% 
     distinct(variable) %>% 
@@ -99,6 +99,7 @@ graph_single_year <- function(x){
       geom_point(aes(x = estimate), size = 2) +
       facet_wrap(~category, scales = "free_x") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
       guides(color = "none") +
@@ -113,6 +114,7 @@ graph_single_year <- function(x){
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
       guides(color = "none",
@@ -127,6 +129,7 @@ graph_single_year <- function(x){
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID)) +
       geom_col(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
       guides(color = "none",
@@ -137,7 +140,7 @@ graph_single_year <- function(x){
   
 }
 
-graph_multiple_year <- function(x){
+graph_multiple_year <- function(x, custom_palette){
   
   var_name <- x %>% 
     distinct(variable) %>% 
@@ -158,6 +161,7 @@ graph_multiple_year <- function(x){
       geom_point(size = 1.5) +
       facet_wrap(~category, scales = "free_y") +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
       guides(color = "none",
@@ -174,6 +178,7 @@ graph_multiple_year <- function(x){
       geom_point(aes(y = estimate), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
       guides(color = "none",
@@ -189,6 +194,7 @@ graph_multiple_year <- function(x){
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
       guides(color = "none") +
