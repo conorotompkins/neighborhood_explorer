@@ -183,7 +183,7 @@ server <- function(input, output, session){
         #selected polygons
         addPolygons(data = selected_tracts_geo_reactive(),
                     fillColor = ~leaflet_pal(GEOID),
-                    fillOpacity = .9,
+                    fillOpacity = .5,
                     weight = 1,
                     color = "black",
                     stroke = TRUE,
@@ -206,11 +206,13 @@ server <- function(input, output, session){
   
   observeEvent(plotly_hover_event_reactive(), { 
     
+    leaflet_pal <- colorFactor(palette_reactive(), selected_tracts_geo_reactive()$GEOID)
+    
     proxy %>% 
       clearGroup("hover_polygon") %>% 
       addPolygons(data = ac_tracts_reactive() %>% 
                     semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")),
-                  fillColor = "yellow",
+                  fillColor = ~leaflet_pal(GEOID),
                   fillOpacity = 1,
                   color = "black",
                   weight = 3,
