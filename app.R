@@ -5,6 +5,7 @@ library(leaflet)
 library(sf)
 library(DT)
 library(plotly)
+library(scales)
 
 library(here)
 
@@ -122,6 +123,14 @@ server <- function(input, output, session){
   })
   
   #create empty vector to hold all click ids
+  selected <- reactiveValues(groups = vector())
+  
+  #reset selected tracts when tract_year changes
+  observeEvent(tract_year_reactive(), {
+    
+    selected$groups <- NULL
+    
+  })
   
   #initial map output
   output$map <- renderLeaflet({
@@ -142,16 +151,6 @@ server <- function(input, output, session){
   #define leaflet proxy for second regional level map
   proxy <- leafletProxy("map")
   
-  #create empty vector to hold all click ids
-  selected <- reactiveValues(groups = vector())
-  
-  #reset selected tracts when tract_year changes
-  observeEvent(tract_year_reactive(), {
-    
-    selected$groups <- NULL
-    
-  })
-  
   selected_tracts_geo_reactive <- reactive({
     
     ac_tracts_reactive() %>% 
@@ -159,15 +158,31 @@ server <- function(input, output, session){
     
   })
   
-  observeEvent(input$map_shape_click, {
+  #set up palette
+  tract_count <- reactive({
+    
+    length(selected$groups)
+    
+  })
+  
+  palette_reactive <- reactive({
+    
+    hue_pal()(tract_count())
+    
+  })
+  
+    observeEvent(input$map_shape_click, {
     
     if(input$map_shape_click$group == "base_map"){
       #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new layer
       selected$groups <- c(selected$groups, str_remove(input$map_shape_click$id, "^Tract ")) #remove "Tract " from start of id on the fly
+      
+      leaflet_pal <- colorFactor(palette_reactive(), selected_tracts_geo_reactive()$GEOID)
+      
       proxy %>%
         #selected polygons
         addPolygons(data = selected_tracts_geo_reactive(),
-                    fillColor = "yellow",
+                    fillColor = ~leaflet_pal(GEOID),
                     fillOpacity = .5,
                     weight = 1,
                     color = "black",
@@ -191,11 +206,13 @@ server <- function(input, output, session){
   
   observeEvent(plotly_hover_event_reactive(), { 
     
+    leaflet_pal <- colorFactor(palette_reactive(), selected_tracts_geo_reactive()$GEOID)
+    
     proxy %>% 
       clearGroup("hover_polygon") %>% 
       addPolygons(data = ac_tracts_reactive() %>% 
                     semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")),
-                  fillColor = "yellow",
+                  fillColor = ~leaflet_pal(GEOID),
                   fillOpacity = 1,
                   color = "black",
                   weight = 3,
@@ -273,7 +290,7 @@ server <- function(input, output, session){
     }
     
     x %>% 
-      make_graph() %>% 
+      make_graph(custom_palette = palette_reactive()) %>% 
       ggplotly() %>% 
       highlight(on = "plotly_hover", off = "plotly_doubleclick")
     
