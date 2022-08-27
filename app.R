@@ -23,6 +23,12 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
+  h1(
+    
+    "My test header"
+    
+  ),
+  
   fluidRow(
     
     column(width = 2,
