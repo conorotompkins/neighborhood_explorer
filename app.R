@@ -23,12 +23,34 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
-  div(
-    class="d-none d-lg-inline-flex",
-    h1(
-      a(href = "https://ctompkins.netlify.app/", "Conor Tompkins")
-    )
+  div(#define style that lays out subdivs horizontally and assigns percentages to width
+    
+    style = "height:100%; max-width:500px; overflow: hidden; padding: 10px; vertical-align: bottom",
+    div(style = "float: left; width:250px; padding: 5px",
+        span(style = "font-size: 25px; font-family: roboto, sans-serif; font-weight: 700",
+             "Conor Tompkins")
+    ),
+    div(style = "float: left; width:50px; padding: 5px",
+        span(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400",
+             "Posts")),
+    div(style = "float: left; width:50px; padding: 5px",
+        span(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400",
+             "Apps"))
+    
   ),
+  
+  # div(
+  #   tags$ul(
+  #     tags$li(
+  #       h1(tags$a(style = "color: #2B2B2B", href = "https://ctompkins.netlify.app/", "Conor Tompkins"))
+  #     ),
+  #     tags$li(
+  #       h2(
+  #         a(href = "https://ctompkins.netlify.app/#posts", "posts")
+  #       )
+  #     )
+  #   )
+  # ),
   
   fluidRow(
     
