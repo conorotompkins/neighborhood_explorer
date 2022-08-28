@@ -23,10 +23,11 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
-  h1(
-    
-    "My test header"
-    
+  div(
+    class="d-none d-lg-inline-flex",
+    h1(
+      a(href = "https://ctompkins.netlify.app/", "Conor Tompkins")
+    )
   ),
   
   fluidRow(
@@ -76,7 +77,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session){
-
+  
   #modal at start
   observeEvent(1, {
     
@@ -177,7 +178,7 @@ server <- function(input, output, session){
     
   })
   
-    observeEvent(input$map_shape_click, {
+  observeEvent(input$map_shape_click, {
     
     if(input$map_shape_click$group == "base_map"){
       #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new layer
