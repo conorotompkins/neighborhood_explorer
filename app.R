@@ -25,8 +25,8 @@ ui <- fluidPage(
   
   div(#define style that lays out subdivs horizontally and assigns percentages to width
     
-    style = "height:100%; max-width:500px; overflow: hidden; padding: 10px; vertical-align: bottom",
-    div(style = "float: left; width:250px; padding: 5px",
+    style = "height:100%; max-width:350px; overflow: hidden; padding: 10px; vertical-align: bottom",
+    div(style = "float: left; width:230px; padding: 5px",
         span(
           a(style = "font-size: 25px; font-family: roboto, sans-serif; font-weight: 700; color: #2B2B2B; text-decoration: none;",
             href = "https://ctompkins.netlify.app/", "Conor Tompkins")
