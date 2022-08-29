@@ -23,6 +23,43 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
+  div(#define style that lays out subdivs horizontally and assigns percentages to width
+    
+    style = "height:100%; max-width:350px; overflow: hidden; padding: 10px; vertical-align: bottom",
+    div(style = "float: left; width:230px; padding: 5px",
+        span(
+          a(style = "font-size: 25px; font-family: roboto, sans-serif; font-weight: 700; color: #2B2B2B; text-decoration: none;",
+            href = "https://ctompkins.netlify.app/", "Conor Tompkins")
+        )
+    ),
+    div(style = "float: left; width:50px; padding: 5px",
+        span(
+          a(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400; color: #2B2B2B; text-decoration: none;",
+            href = "https://ctompkins.netlify.app/#posts", "Posts")
+        )
+    ),
+    div(style = "float: left; width:50px; padding: 5px",
+        span(
+             a(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400; color: #2B2B2B; text-decoration: none;",
+               href = "https://ctompkins.netlify.app/apps/app-gallery/", "Apps")
+        )
+    )
+    
+  ),
+  
+  # div(
+  #   tags$ul(
+  #     tags$li(
+  #       h1(tags$a(style = "color: #2B2B2B", href = "https://ctompkins.netlify.app/", "Conor Tompkins"))
+  #     ),
+  #     tags$li(
+  #       h2(
+  #         a(href = "https://ctompkins.netlify.app/#posts", "posts")
+  #       )
+  #     )
+  #   )
+  # ),
+  
   fluidRow(
     
     column(width = 2,
@@ -70,7 +107,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session){
-
+  
   #modal at start
   observeEvent(1, {
     
@@ -171,7 +208,7 @@ server <- function(input, output, session){
     
   })
   
-    observeEvent(input$map_shape_click, {
+  observeEvent(input$map_shape_click, {
     
     if(input$map_shape_click$group == "base_map"){
       #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new layer
