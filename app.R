@@ -28,14 +28,19 @@ ui <- fluidPage(
     style = "height:100%; max-width:500px; overflow: hidden; padding: 10px; vertical-align: bottom",
     div(style = "float: left; width:250px; padding: 5px",
         span(style = "font-size: 25px; font-family: roboto, sans-serif; font-weight: 700",
-             "Conor Tompkins")
+             a(href = "https://ctompkins.netlify.app/", "Conor Tompkins")
+        )
     ),
     div(style = "float: left; width:50px; padding: 5px",
         span(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400",
-             "Posts")),
+             a(href = "https://ctompkins.netlify.app/#posts", "Posts")
+        )
+    ),
     div(style = "float: left; width:50px; padding: 5px",
         span(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400",
-             "Apps"))
+             a(href = "https://ctompkins.netlify.app/apps/app-gallery/", "Apps")
+        )
+    )
     
   ),
   
