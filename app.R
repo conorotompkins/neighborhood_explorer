@@ -41,6 +41,12 @@ ui <- fluidPage(
                        min = 2010,
                        max = 2019,
                        sep = "")
+    ),
+    
+    column(width = 3,
+           
+           uiOutput("category_filter")
+           
     )
   ),
   
@@ -70,7 +76,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session){
-
+  
   #modal at start
   observeEvent(1, {
     
@@ -93,6 +99,9 @@ server <- function(input, output, session){
   })
   
   observeEvent(data_source_reactive(), {
+    
+    print(data_source_reactive())
+    print(names(data_source_reactive()))
     
     year_min <- min(data_source_reactive()$year)
     year_max <- max(data_source_reactive()$year)
@@ -171,7 +180,7 @@ server <- function(input, output, session){
     
   })
   
-    observeEvent(input$map_shape_click, {
+  observeEvent(input$map_shape_click, {
     
     if(input$map_shape_click$group == "base_map"){
       #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new layer
@@ -308,6 +317,26 @@ server <- function(input, output, session){
     req(plotly_hover_event_reactive())
     
     plotly_hover_event_reactive()
+    
+  })
+  
+  output$category_filter <- renderUI({
+    
+    print(data_source_reactive())
+    
+    if("category" %in% names(data_source_reactive())){
+      
+      selectizeInput(inputId = "categories",
+                     label = "Select categories",
+                     choices = data_source_reactive() %>% 
+                       distinct(category) %>% 
+                       pull(),
+                     selected = data_source_reactive() %>% 
+                       distinct(category) %>% 
+                       slice_head(n = 3) %>% 
+                       pull(),
+                     multiple = TRUE)
+    } else NULL
     
   })
   
