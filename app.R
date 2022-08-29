@@ -298,6 +298,21 @@ server <- function(input, output, session){
       
     }
     
+    if ("category" %in% names(data_source_reactive())){
+      
+      req(input$categories)
+      
+      x <- x %>% 
+        filter(category %in% input$categories)
+      
+    }
+    
+    else {
+      
+      x
+      
+    }
+    
     x %>% 
       make_graph(custom_palette = palette_reactive()) %>% 
       ggplotly() %>% 
