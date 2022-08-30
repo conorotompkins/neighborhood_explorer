@@ -78,6 +78,12 @@ ui <- fluidPage(
                        min = 2010,
                        max = 2019,
                        sep = "")
+    ),
+    
+    column(width = 3,
+           
+           uiOutput("category_filter")
+           
     )
   ),
   
@@ -130,7 +136,7 @@ server <- function(input, output, session){
   })
   
   observeEvent(data_source_reactive(), {
-    
+
     year_min <- min(data_source_reactive()$year)
     year_max <- max(data_source_reactive()$year)
     
@@ -276,7 +282,22 @@ server <- function(input, output, session){
     
     req(geoid_table_reactive())
     
-    var_name <- geoid_table_reactive() %>% 
+    if ("category" %in% names(data_source_reactive())){
+      
+      req(input$categories)
+      
+      x <- geoid_table_reactive() %>% 
+        filter(category %in% input$categories)
+      
+    }
+    
+    else {
+      
+      x
+      
+    }
+    
+    var_name <- x %>% 
       distinct(variable) %>% 
       pull()
     
@@ -284,7 +305,7 @@ server <- function(input, output, session){
       str_replace_all("_", " ") %>% 
       str_to_title()
     
-    table_df <- geoid_table_reactive() %>% 
+    table_df <- x %>% 
       select(-c(NAME))
     
     table_df_names <- names(table_df) %>% 
@@ -326,6 +347,21 @@ server <- function(input, output, session){
       
     }
     
+    if ("category" %in% names(data_source_reactive())){
+      
+      req(input$categories)
+      
+      x <- x %>% 
+        filter(category %in% input$categories)
+      
+    }
+    
+    else {
+      
+      x
+      
+    }
+    
     x %>% 
       make_graph(custom_palette = palette_reactive()) %>% 
       ggplotly() %>% 
@@ -345,6 +381,24 @@ server <- function(input, output, session){
     req(plotly_hover_event_reactive())
     
     plotly_hover_event_reactive()
+    
+  })
+  
+  output$category_filter <- renderUI({
+    
+    if("category" %in% names(data_source_reactive())){
+      
+      selectizeInput(inputId = "categories",
+                     label = "Select categories",
+                     choices = data_source_reactive() %>% 
+                       distinct(category) %>% 
+                       pull(),
+                     selected = data_source_reactive() %>% 
+                       distinct(category) %>% 
+                       slice_head(n = 3) %>% 
+                       pull(),
+                     multiple = TRUE)
+    } else NULL
     
   })
   
