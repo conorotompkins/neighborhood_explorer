@@ -248,7 +248,22 @@ server <- function(input, output, session){
     
     req(geoid_table_reactive())
     
-    var_name <- geoid_table_reactive() %>% 
+    if ("category" %in% names(data_source_reactive())){
+      
+      req(input$categories)
+      
+      x <- geoid_table_reactive() %>% 
+        filter(category %in% input$categories)
+      
+    }
+    
+    else {
+      
+      x
+      
+    }
+    
+    var_name <- x %>% 
       distinct(variable) %>% 
       pull()
     
@@ -256,7 +271,7 @@ server <- function(input, output, session){
       str_replace_all("_", " ") %>% 
       str_to_title()
     
-    table_df <- geoid_table_reactive() %>% 
+    table_df <- x %>% 
       select(-c(NAME))
     
     table_df_names <- names(table_df) %>% 
