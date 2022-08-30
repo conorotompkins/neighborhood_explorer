@@ -99,10 +99,7 @@ server <- function(input, output, session){
   })
   
   observeEvent(data_source_reactive(), {
-    
-    print(data_source_reactive())
-    print(names(data_source_reactive()))
-    
+
     year_min <- min(data_source_reactive()$year)
     year_max <- max(data_source_reactive()$year)
     
@@ -351,8 +348,6 @@ server <- function(input, output, session){
   })
   
   output$category_filter <- renderUI({
-    
-    print(data_source_reactive())
     
     if("category" %in% names(data_source_reactive())){
       
