@@ -293,7 +293,7 @@ server <- function(input, output, session){
     
     else {
       
-      x
+      x <- geoid_table_reactive()
       
     }
     
