@@ -365,7 +365,8 @@ server <- function(input, output, session){
     x %>% 
       make_graph(custom_palette = palette_reactive()) %>% 
       ggplotly() %>% 
-      highlight(on = "plotly_hover", off = "plotly_doubleclick")
+      highlight(on = "plotly_hover", off = "plotly_doubleclick") %>% 
+      layout(showlegend = FALSE)
     
   })
   
