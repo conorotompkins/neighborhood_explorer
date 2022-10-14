@@ -2,6 +2,8 @@ library(tidyverse)
 library(sf)
 library(units)
 
+#HHUUD10.gdb.zip https://osf.io/fzv5e/files/osfstorage/613800da28b37600377cf675
+
 ac_housing <- st_read("inputs/raw/HHUUD10.gdb.zip") %>% 
   rename(geometry = Shape) %>% 
   mutate(UY1 = na_if(UY1, 2035),
