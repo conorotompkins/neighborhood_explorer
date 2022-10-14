@@ -43,10 +43,6 @@ vignettes/*.pdf
 data
 
 outputs
-inputs/**.csv
-inputs/**.dbf
-inputs/**.prj
-inputs/**.shp
-inputs/**.shx
+inputs/**/empty.txt
 
 rsconnect
