@@ -37,7 +37,7 @@ census_data <- c(2010:2019) %>%
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          tract_year = 2010) %>% 
-  select(GEOID, tract_year, NAME, year, category, estimate, summary_est, moe, summary_moe) %>% 
+  select(GEOID, tract_year, NAME, year, variable, category, estimate, summary_est, moe, summary_moe) %>% 
   mutate(pct = estimate / summary_est)
 
 glimpse(census_data)
