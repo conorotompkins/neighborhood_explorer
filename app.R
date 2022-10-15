@@ -66,7 +66,7 @@ ui <- fluidPage(
            
            selectizeInput(inputId = "data_source",
                           label = "Choose topic",
-                          choices = c("median_income", "housing", "commute_modes"))
+                          choices = c("median_income", "housing", "commute_modes", "owner_vs_renter"))
            
     ),
     
