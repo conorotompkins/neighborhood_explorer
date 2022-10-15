@@ -32,7 +32,12 @@ census_data <- c(2010:2019) %>%
              graph_type = "point_in_time",
              tract_year = 2010)},
       .id = "year") %>% 
-  select(GEOID, tract_year, NAME, year, variable, estimate, summary_est, moe, summary_moe) %>% 
+  rename(category = variable) %>% 
+  mutate(variable = "Population",
+         NAME = str_c("Tract", GEOID, sep = " "),
+         graph_type = "discrete",
+         tract_year = 2010) %>% 
+  select(GEOID, tract_year, NAME, year, category, estimate, summary_est, moe, summary_moe) %>% 
   mutate(pct = estimate / summary_est)
 
 glimpse(census_data)
@@ -42,7 +47,7 @@ census_data %>%
 
 census_data %>% 
   filter(GEOID %in% c("42003472400", "42003472300")) %>% 
-  ggplot(aes(year, estimate, color = variable, fill = variable, group = variable)) +
+  ggplot(aes(year, estimate, color = category, fill = category, group = category)) +
   geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
   geom_line() +
   facet_wrap(~GEOID)
