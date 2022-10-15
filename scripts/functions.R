@@ -49,6 +49,24 @@ get_commute_modes <- function(x){
   
 }
 
+get_owner_vs_renter_population <- function(x){
+  
+  here("inputs/data_sources/owner_vs_renter.csv") %>% 
+    read_csv(col_types = cols(
+      GEOID = col_character(),
+      NAME = col_character(),
+      year = col_integer(),
+      variable = col_character(),
+      category = col_character(),
+      estimate = col_double(),
+      summary_est = col_double(),
+      summary_moe = col_double(),
+      moe = col_double(),
+      tract_year = col_double()
+    ))
+  
+}
+
 # get_median_income() %>% 
 #   distinct(graph_type)
 
@@ -59,7 +77,8 @@ get_data <- function(x){
   switch(x,
          housing = get_housing_data(),
          median_income = get_median_income(),
-         commute_modes = get_commute_modes()
+         commute_modes = get_commute_modes(),
+         owner_vs_renter = get_owner_vs_renter_population()
   )
   
 }
