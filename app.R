@@ -334,7 +334,25 @@ server <- function(input, output, session){
     
     req(geoid_table_reactive())
     
-    if ("moe" %in% names(geoid_table_reactive())) {
+    print(names(geoid_table_reactive()))
+    
+    is_percent <- geoid_table_reactive() %>% 
+      distinct(units) %>% 
+      pull() == "percent"
+    
+    column_names <- names(geoid_table_reactive())
+    
+    if ("moe" %in% column_names & is_percent) {
+      
+      x <- geoid_table_reactive() %>% 
+        mutate(lower_bound = estimate - moe,
+               upper_bound = estimate + moe,
+               lower_bound = case_when(lower_bound < 0 ~ 0,
+                                       lower_bound >= 0 ~ lower_bound),
+               upper_bound = case_when(upper_bound > 1 ~ 1,
+                                       upper_bound <= 1 ~ upper_bound))
+      
+    } else if ("moe" %in% column_names & !is_percent) {
       
       x <- geoid_table_reactive() %>% 
         mutate(lower_bound = estimate - moe,
