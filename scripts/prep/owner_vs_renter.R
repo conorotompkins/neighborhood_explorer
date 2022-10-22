@@ -37,8 +37,18 @@ census_data <- c(2010:2019) %>%
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          tract_year = 2010) %>% 
-  select(GEOID, tract_year, NAME, year, variable, category, estimate, summary_est, moe, summary_moe) %>% 
-  mutate(pct = estimate / summary_est)
+  select(GEOID, tract_year, NAME, year, variable, category, estimate, summary_est, moe)
+
+census_data %>% 
+  distinct(category)
+
+census_data <- census_data %>% 
+  filter(category == "Population in owner-occupied housing") %>% 
+  mutate(estimate_pct = estimate / summary_est,
+         moe_pct = moe / estimate) %>% 
+  select(-c(estimate, moe)) %>% 
+  rename(estimate = estimate_pct,
+         moe = moe_pct)
 
 glimpse(census_data)
 
@@ -47,8 +57,6 @@ census_data %>%
 
 census_data %>% 
   filter(GEOID %in% c("42003472400", "42003472300")) %>% 
-  ggplot(aes(year, estimate, color = category, fill = category, group = category)) +
+  ggplot(aes(year, estimate, color = GEOID, fill = GEOID, group = GEOID)) +
   geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
-  geom_line() +
-  facet_wrap(~GEOID)
-      
+  geom_line()
