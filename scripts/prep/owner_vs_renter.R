@@ -33,14 +33,11 @@ census_data_raw <- c(2010:2019) %>%
              tract_year = 2010)},
       .id = "year") %>% 
   rename(category = variable) %>% 
-  mutate(variable = "Population",
+  mutate(variable = "% of population in owner-occupied housing",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          tract_year = 2010) %>% 
   select(GEOID, tract_year, NAME, year, variable, category, estimate, summary_est, moe)
-
-census_data_raw %>% 
-  distinct(category)
 
 census_data <- census_data_raw %>% 
   filter(category == "Population in owner-occupied housing") %>% 
@@ -48,7 +45,7 @@ census_data <- census_data_raw %>%
          moe_pct = moe / estimate,
          moe_pct = case_when(is.infinite(moe_pct) ~ 0,
                              is.finite(moe_pct) ~ moe_pct)) %>% 
-  select(-c(estimate, moe)) %>% 
+  select(-c(estimate, moe, category)) %>% 
   rename(estimate = estimate_pct,
          moe = moe_pct) %>% 
   mutate(units = "percent")
@@ -67,5 +64,5 @@ census_data %>%
 census_data %>% 
   filter(GEOID %in% c("42003051100")) %>% 
   ggplot(aes(year, estimate, color = GEOID, fill = GEOID, group = GEOID)) +
-  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
+  geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
   geom_line()
