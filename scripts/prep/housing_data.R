@@ -31,7 +31,8 @@ ac_housing_hu <- ac_housing_hu %>%
   mutate(variable = "Estimated Housing Units",
          estimate = round(estimate, 0)) %>% 
   select(GEOID, variable, year, estimate) %>% 
-  mutate(tract_year = 2010)
+  mutate(tract_year = 2010,
+         unit = "count")
 
 ac_housing_hu %>% 
   write_csv("inputs/data_sources/housing_data.csv")

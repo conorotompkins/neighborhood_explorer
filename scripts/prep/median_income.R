@@ -17,4 +17,5 @@ c(2010:2019) %>%
              tract_year = 2010)},
       .id = "year") %>% 
   select(GEOID, NAME, year, variable, estimate, moe, tract_year) %>% 
+  mutate(unit = "dollars") %>% 
   write_csv("inputs/data_sources/median_income.csv")

@@ -48,7 +48,7 @@ census_data <- census_data_raw %>%
   select(-c(estimate, moe, category)) %>% 
   rename(estimate = estimate_pct,
          moe = moe_pct) %>% 
-  mutate(units = "percent")
+  mutate(unit = "percent")
 
 glimpse(census_data)
 

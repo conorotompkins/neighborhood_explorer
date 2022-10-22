@@ -39,4 +39,5 @@ c(2010:2019) %>%
          graph_type = "discrete",
          tract_year = 2010) %>% 
   select(GEOID, NAME, year, variable, category, estimate, moe, tract_year) %>% 
+  mutate(unit = "count") %>% 
   write_csv("inputs/data_sources/commute_modes.csv")

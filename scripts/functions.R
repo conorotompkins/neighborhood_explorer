@@ -10,7 +10,8 @@ get_housing_data <- function(){
       variable = col_character(),
       year = col_double(),
       estimate = col_double(),
-      tract_year = col_double()
+      tract_year = col_double(),
+      unit = col_character()
     ))
   
 }
@@ -28,7 +29,8 @@ get_median_income <- function(x){
       estimate = col_double(),
       moe = col_double(),
       NAME = col_character(),
-      tract_year = col_double()
+      tract_year = col_double(),
+      unit = col_character()
     ))
   
 }
@@ -44,7 +46,8 @@ get_commute_modes <- function(x){
       category = col_character(),
       estimate = col_double(),
       moe = col_double(),
-      tract_year = col_double()
+      tract_year = col_double(),
+      unit = col_character()
     ))
   
 }
@@ -60,7 +63,7 @@ get_owner_vs_renter_population <- function(x){
       estimate = col_double(),
       moe = col_double(),
       tract_year = col_double(),
-      units = col_character()
+      unit = col_character()
     ))
   
 }
