@@ -59,10 +59,9 @@ get_owner_vs_renter_population <- function(x){
       variable = col_character(),
       category = col_character(),
       estimate = col_double(),
-      summary_est = col_double(),
-      summary_moe = col_double(),
       moe = col_double(),
-      tract_year = col_double()
+      tract_year = col_double(),
+      units = col_character()
     ))
   
 }
