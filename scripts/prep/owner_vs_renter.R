@@ -18,7 +18,7 @@ glimpse(acs_vars)
 #   filter(concept == "TOTAL POPULATION IN OCCUPIED HOUSING UNITS BY TENURE BY YEAR HOUSEHOLDER MOVED INTO UNIT") %>% 
 #   view()
 
-census_data <- c(2010:2019) %>% 
+census_data_raw <- c(2010:2019) %>% 
   set_names() %>% 
   map_dfr({~get_acs(geography = "tract", 
                     state = "Pennsylvania",
@@ -39,16 +39,19 @@ census_data <- c(2010:2019) %>%
          tract_year = 2010) %>% 
   select(GEOID, tract_year, NAME, year, variable, category, estimate, summary_est, moe)
 
-census_data %>% 
+census_data_raw %>% 
   distinct(category)
 
-census_data <- census_data %>% 
+census_data <- census_data_raw %>% 
   filter(category == "Population in owner-occupied housing") %>% 
   mutate(estimate_pct = estimate / summary_est,
-         moe_pct = moe / estimate) %>% 
+         moe_pct = moe / estimate,
+         moe_pct = case_when(is.infinite(moe_pct) ~ 0,
+                             is.finite(moe_pct) ~ moe_pct)) %>% 
   select(-c(estimate, moe)) %>% 
   rename(estimate = estimate_pct,
-         moe = moe_pct)
+         moe = moe_pct) %>% 
+  mutate(units = "percent")
 
 glimpse(census_data)
 
@@ -59,4 +62,10 @@ census_data %>%
   filter(GEOID %in% c("42003472400", "42003472300")) %>% 
   ggplot(aes(year, estimate, color = GEOID, fill = GEOID, group = GEOID)) +
   geom_ribbon(aes(ymin = estimate - moe, ymax = estimate + moe), alpha = .3) +
+  geom_line()
+
+census_data %>% 
+  filter(GEOID %in% c("42003051100")) %>% 
+  ggplot(aes(year, estimate, color = GEOID, fill = GEOID, group = GEOID)) +
+  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .3) +
   geom_line()
