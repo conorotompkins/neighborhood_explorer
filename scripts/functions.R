@@ -182,6 +182,7 @@ graph_multiple_year <- function(x, custom_palette){
       facet_wrap(~category, scales = "free_y") +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
+      scale_fill_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
       guides(color = "none",
