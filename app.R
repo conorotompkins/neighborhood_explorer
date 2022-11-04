@@ -335,7 +335,7 @@ server <- function(input, output, session){
     req(geoid_table_reactive())
     
     is_percent <- geoid_table_reactive() %>% 
-      distinct(units) %>% 
+      distinct(unit) %>% 
       pull() == "percent"
     
     column_names <- names(geoid_table_reactive())
