@@ -166,14 +166,30 @@ server <- function(input, output, session){
   })
   
   #create empty vector to hold all click ids
-  selected <- reactiveValues(groups = vector())
+  selected <- reactiveVallues(groups = vector(),
+                             counter = 0)
   
   #reset selected tracts when tract_year changes
   observeEvent(tract_year_reactive(), {
     
+    print(names(selected))
+    
     selected$groups <- NULL
     
   })
+  
+  observeEvent(input$map_shape_click$group == "base_map" & !(selected_tracts_geo_reactive()$GEOID %in% selected$groups) & length(selected$groups) > 0, {
+    print(input$map_shape_click$group)
+    print(selected$groups)
+    print(selected_tracts_geo_reactive()$GEOID)
+    print(str_remove(input$map_shape_click$id, "^Tract "))
+    print(str_c("Was ", selected$counter, sep = ""))
+    
+    selected$counter <- selected$counter + 1
+    
+    print(str_c("Now is ", selected$counter, sep = ""))
+    
+  }, ignoreInit = TRUE)
   
   #initial map output
   output$map <- renderLeaflet({
@@ -249,9 +265,11 @@ server <- function(input, output, session){
   
   observeEvent(plotly_hover_event_reactive(), { 
     
+    print("highlighting tract on map based on plotly hover")
+    
     leaflet_pal <- colorFactor(palette_reactive(), selected_tracts_geo_reactive()$GEOID)
     
-    proxy %>% 
+    output <- proxy %>% 
       clearGroup("hover_polygon") %>% 
       addPolygons(data = ac_tracts_reactive() %>% 
                     semi_join(plotly_hover_event_reactive(), by = c("GEOID" = "customdata")),
@@ -262,13 +280,19 @@ server <- function(input, output, session){
                   label = ~GEOID,
                   group = "hover_polygon")
     
+    print("finished highlight")
+    
+    return(output)
+    
   })
   
   geoid_table_reactive <- reactive({
     
     req(length(selected$groups) > 0)
     
-    selected$groups %>% 
+    print("Join selected$groups to data_source_reactive()")
+    
+    output <- selected$groups %>% 
       enframe(value = "GEOID") %>% 
       select(-name) %>% 
       left_join(st_drop_geometry(ac_tracts_reactive()), by = "GEOID") %>% 
@@ -276,6 +300,9 @@ server <- function(input, output, session){
       left_join(data_source_reactive()) %>% 
       filter(between(year, input$year_slider[1], input$year_slider[2]))
     
+    print("finished join")
+    
+    return(output)
   })
   
   output$geoid_table <- DT::renderDataTable({
