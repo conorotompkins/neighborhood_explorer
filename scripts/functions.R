@@ -130,7 +130,7 @@ graph_single_year <- function(x, custom_palette){
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(y = GEOID, color = GEOID, fill = GEOID, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
@@ -147,9 +147,9 @@ graph_single_year <- function(x, custom_palette){
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID)) +
-      geom_col(aes(x = estimate), size = 2) +
+      geom_col(aes(x = estimate), size = .5, color = "black") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
-      scale_color_manual(values = custom_palette) +
+      scale_fill_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
       guides(color = "none",
@@ -182,6 +182,7 @@ graph_multiple_year <- function(x, custom_palette){
       facet_wrap(~category, scales = "free_y") +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
+      scale_fill_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
       guides(color = "none",
@@ -199,6 +200,7 @@ graph_multiple_year <- function(x, custom_palette){
       scale_x_continuous(breaks = custom_breaks) +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
+      scale_fill_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
       guides(color = "none",
