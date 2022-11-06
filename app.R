@@ -166,7 +166,7 @@ server <- function(input, output, session){
   })
   
   #create empty vector to hold all click ids
-  selected <- reactiveVallues(groups = vector(),
+  selected <- reactiveValues(groups = vector(),
                              counter = 0)
   
   #reset selected tracts when tract_year changes
