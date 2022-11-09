@@ -230,7 +230,7 @@ server <- function(input, output, session){
                     weight = 1,
                     color = "black",
                     stroke = TRUE,
-                    layerId = ~GEOID,
+                    layerId = ~GEOID, #feeds into setdiff function to remove a tract
                     group = ~GEOID,
                     label = ~GEOID)
     } else if(input$map_shape_click$group == "hover_polygon") {
@@ -240,7 +240,8 @@ server <- function(input, output, session){
       
     } else {
       #when the user clicks a tract that is already in selected$groups, remove that tract from selected$groups and remove it from the second layer
-      selected$groups <- setdiff(selected$groups, input$map_shape_click$group)
+
+      selected$groups <- setdiff(selected$groups, str_remove(input$map_shape_click$id, "^Tract "))
       
       proxy %>% clearGroup(input$map_shape_click$group)
       
