@@ -43,7 +43,7 @@ An app for analyzing data at the neighborhood level
 
 -   [{leaflet}](https://rstudio.github.io/leaflet/)
 
-Next steps:
+### Next steps
 
 -   Add more topics
 
