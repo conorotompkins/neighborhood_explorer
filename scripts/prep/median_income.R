@@ -1,8 +1,17 @@
+#script to extract median household income by tract
+
 library(tidyverse)
 library(tidycensus)
 library(sf)
 
 options(tigris_use_cache = TRUE)
+
+acs_vars <- load_variables(year = 2020, dataset = "acs5")
+
+glimpse(acs_vars)
+
+acs_vars |> 
+  filter(name == "B19013_001")
 
 c(2010:2019) %>% 
   set_names() %>% 
