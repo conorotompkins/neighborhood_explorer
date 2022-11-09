@@ -1,3 +1,5 @@
+#script to process housing unit data from https://osf.io/fzv5e/?view_only=
+
 library(tidyverse)
 library(sf)
 library(units)
@@ -19,6 +21,7 @@ ac_housing_hu <- ac_housing %>%
   select(GEOID, starts_with("hu")) %>% 
   pivot_longer(cols = starts_with("hu"), names_to = "year", values_to = "housing_units")
 
+#fix year column
 year_lookup <- ac_housing_hu %>% 
   distinct(year) %>% 
   mutate(year_fixed = c(1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2019))
