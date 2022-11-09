@@ -6,9 +6,12 @@ library(sf)
 
 options(tigris_use_cache = TRUE)
 
-acs_vars <- load_variables(year = 2020, dataset = "acs5")
-
-glimpse(acs_vars)
+# acs_vars <- load_variables(year = 2020, dataset = "acs5")
+# 
+# glimpse(acs_vars)
+# 
+# acs_vars |> 
+#   filter(name == "B19013_001")
 
 # acs_vars %>% 
 #   filter(geography == "tract") %>% 
