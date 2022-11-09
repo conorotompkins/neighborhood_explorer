@@ -1,3 +1,5 @@
+#script to get commute mode data by tract
+
 library(tidyverse)
 library(tidycensus)
 library(sf)
@@ -10,6 +12,7 @@ acs1_vars <- load_variables(2019, 'acs1') %>%
 acs1_vars %>% 
   filter(str_detect(name, "B08301"))
 
+#label commute modes
 all_transit_vars <- c("Drove alone (car/truck/van)" = "B08301_003", 
                       "Carpooled (car/truck/van)" = "B08301_004", 
                       "Public transportation (excluding taxicab)" = "B08301_010", 
