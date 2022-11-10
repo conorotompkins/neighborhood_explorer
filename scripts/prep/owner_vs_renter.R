@@ -1,12 +1,17 @@
+#script to extract what % of a tracts population lives in owner-occupied vs renter-occupied housing
+
 library(tidyverse)
 library(tidycensus)
 library(sf)
 
 options(tigris_use_cache = TRUE)
 
-acs_vars <- load_variables(year = 2020, dataset = "acs5")
-
-glimpse(acs_vars)
+# acs_vars <- load_variables(year = 2020, dataset = "acs5")
+# 
+# glimpse(acs_vars)
+# 
+# acs_vars |> 
+#   filter(name == "B19013_001")
 
 # acs_vars %>% 
 #   filter(geography == "tract") %>% 
@@ -18,6 +23,7 @@ glimpse(acs_vars)
 #   filter(concept == "TOTAL POPULATION IN OCCUPIED HOUSING UNITS BY TENURE BY YEAR HOUSEHOLDER MOVED INTO UNIT") %>% 
 #   view()
 
+#get census data for years 2010 through 2019
 census_data_raw <- c(2010:2019) %>% 
   set_names() %>% 
   map_dfr({~get_acs(geography = "tract", 
@@ -36,9 +42,10 @@ census_data_raw <- c(2010:2019) %>%
   mutate(variable = "% of population in owner-occupied housing",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
-         tract_year = 2010) %>% 
+         tract_year = 2010) %>% #tract year defines which decade the tract was created for
   select(GEOID, tract_year, NAME, year, variable, category, estimate, summary_est, moe)
 
+#transform data so it is expressed in terms of % of population in owner-occupied housing
 census_data <- census_data_raw %>% 
   filter(category == "Population in owner-occupied housing") %>% 
   mutate(estimate_pct = estimate / summary_est,
@@ -55,6 +62,7 @@ glimpse(census_data)
 census_data %>% 
   write_csv("inputs/data_sources/owner_vs_renter.csv")
 
+#test plots
 census_data %>% 
   filter(GEOID %in% c("42003472400", "42003472300")) %>% 
   ggplot(aes(year, estimate, color = GEOID, fill = GEOID, group = GEOID)) +

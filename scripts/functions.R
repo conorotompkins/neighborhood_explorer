@@ -73,6 +73,7 @@ get_owner_vs_renter_population <- function(x){
 
 data_source <- "housing"
 
+#routing function to get appropriate data source
 get_data <- function(x){
   
   switch(x,
@@ -87,6 +88,7 @@ get_data <- function(x){
 #get_data("housing")
 #get_data("median_income")
 
+#routing function to make graphs. graph type depends on how many yerrs are in scope
 make_graph <- function(target_df, custom_palette){
   
   graph_type <- target_df %>% 
@@ -103,12 +105,15 @@ make_graph <- function(target_df, custom_palette){
   
 }
 
+#make a graph to show data with only one year in scope
 graph_single_year <- function(x, custom_palette){
   
+  #extract variable name
   var_name <- x %>% 
     distinct(variable) %>% 
     pull()
   
+  #if the data source has a category and margin of error, make a geom_errorbar plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
     
     x %>% 
@@ -125,6 +130,7 @@ graph_single_year <- function(x, custom_palette){
       guides(color = "none") +
       theme_bw(base_size = 14)
     
+  #if the data source has a category, make a geom_errorbar plot
   } else if ("moe" %in% names(x)){
     
     x %>% 
@@ -141,6 +147,7 @@ graph_single_year <- function(x, custom_palette){
              fill = "none") +
       theme_bw(base_size = 14)
     
+    #otherwise make a bar plot
   } else {
     
     x %>% 
@@ -160,16 +167,20 @@ graph_single_year <- function(x, custom_palette){
   
 }
 
+#routing function to make graphs when the data source has multiple years in scope
 graph_multiple_year <- function(x, custom_palette){
   
+  #extract variable name
   var_name <- x %>% 
     distinct(variable) %>% 
     pull()
   
+  #define custom breaks for ggplot
   custom_breaks <- x %>% 
     distinct(year) %>% 
     pull()
   
+  #if the data source has category and margin of error, make a ribbon plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
     
     x %>% 
@@ -189,6 +200,7 @@ graph_multiple_year <- function(x, custom_palette){
              fill = "none") +
       theme_bw()
     
+  #if the data source has category, make a ribbon plot
   } else if ("moe" %in% names(x)){
     
     x %>% 
@@ -207,6 +219,7 @@ graph_multiple_year <- function(x, custom_palette){
              fill = "none") +
       theme_bw()
     
+  #otherwise make a line graph
   } else {
     
     x %>% 

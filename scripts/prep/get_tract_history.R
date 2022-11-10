@@ -1,3 +1,5 @@
+#script to get tract shape history. uses median income as a dummy variable
+
 library(tidyverse)
 library(tidycensus)
 library(sf)
@@ -8,7 +10,7 @@ ac_geo <- c(2010, 2020) %>%
   map({~get_acs(geography = "tract", 
                state = "Pennsylvania",
                county = "Allegheny County",
-               variables = c(medincome = "B19013_001"),
+               variables = c(mediancome = "B19013_001"),
                year = .x,
                geometry = T) %>% 
       mutate(tract_year = .x) %>% 

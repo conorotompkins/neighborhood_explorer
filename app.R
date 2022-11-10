@@ -23,6 +23,7 @@ ac_geo <- st_read("inputs/allegheny_county_tract_history/allegheny_county_tract_
 
 ui <- fluidPage(
   
+  #define app header
   div(#define style that lays out subdivs horizontally and assigns percentages to width
     
     style = "height:100%; max-width:350px; overflow: hidden; padding: 10px; vertical-align: bottom",
@@ -40,8 +41,8 @@ ui <- fluidPage(
     ),
     div(style = "float: left; width:50px; padding: 5px",
         span(
-             a(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400; color: #2B2B2B; text-decoration: none;",
-               href = "https://ctompkins.netlify.app/apps/app-gallery/", "Apps")
+          a(style = "font-size: 16px; font-family: roboto, sans-serif; font-weight: 400; color: #2B2B2B; text-decoration: none;",
+            href = "https://ctompkins.netlify.app/apps/app-gallery/", "Apps")
         )
     )
     
@@ -64,6 +65,7 @@ ui <- fluidPage(
     
     column(width = 2,
            
+           #user selects topic
            selectizeInput(inputId = "data_source",
                           label = "Choose topic",
                           choices = c("median_income", "housing", "commute_modes", "owner_vs_renter"))
@@ -72,6 +74,7 @@ ui <- fluidPage(
     
     column(width = 3,
            
+           #user selects years in scope
            sliderInput(inputId = "year_slider",
                        label = "Year",
                        value = c(2010, 2019),
@@ -82,6 +85,7 @@ ui <- fluidPage(
     
     column(width = 3,
            
+           #user can select which categories are in scope
            uiOutput("category_filter")
            
     )
@@ -91,6 +95,7 @@ ui <- fluidPage(
          
          fluidRow(
            
+           #shows leaflet map
            leafletOutput("map")
            
          ),
@@ -99,9 +104,11 @@ ui <- fluidPage(
            
            tabsetPanel(
              
+             #shows graph
              tabPanel(title = "Graph",
                       plotlyOutput("bar_chart")),
              
+             #shows summary table
              tabPanel(title = "Table",
                       DT::dataTableOutput("geoid_table"))
              
@@ -114,7 +121,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session){
   
-  #modal at start
+  #prompt the user with a modal at start
   observeEvent(1, {
     
     showModal(
@@ -129,14 +136,16 @@ server <- function(input, output, session){
     
   })
   
+  #fetch data
   data_source_reactive <- reactive({
     
     get_data(input$data_source)
     
   })
   
+  #dynamically update SliderInput based on the data source. some data sources have yearly data, others have it by decade
   observeEvent(data_source_reactive(), {
-
+    
     year_min <- min(data_source_reactive()$year)
     year_max <- max(data_source_reactive()$year)
     
@@ -150,6 +159,7 @@ server <- function(input, output, session){
     
   })
   
+  #tracts which decade the census tracts were created in
   tract_year_reactive <- reactive({
     
     isolate(data_source_reactive()) %>% 
@@ -158,6 +168,7 @@ server <- function(input, output, session){
     
   })
   
+  #filters simple features df with the correct census tract year
   ac_tracts_reactive <- reactive({
     
     ac_geo %>% 
@@ -165,10 +176,10 @@ server <- function(input, output, session){
     
   })
   
-  #create empty vector to hold all click ids
+  #create empty vector to hold all census tracts the user clicks on
   selected <- reactiveValues(groups = vector())
   
-  #reset selected tracts when tract_year changes
+  #reset selected tracts when tract_year_reactive changes
   observeEvent(tract_year_reactive(), {
     
     selected$groups <- NULL
@@ -186,7 +197,7 @@ server <- function(input, output, session){
                   color = "black",
                   stroke = TRUE,
                   weight = 1,
-                  layerId = ~NAME,
+                  layerId = ~NAME, #NAME = str_c("Tract", GEOID, sep = " ")
                   group = "base_map",
                   label = ~NAME)
   }) #END RENDER LEAFLET
@@ -194,6 +205,7 @@ server <- function(input, output, session){
   #define leaflet proxy for second regional level map
   proxy <- leafletProxy("map")
   
+  #df that only contains data for the tracts the user has selected
   selected_tracts_geo_reactive <- reactive({
     
     ac_tracts_reactive() %>% 
@@ -214,10 +226,11 @@ server <- function(input, output, session){
     
   })
   
+  #define logic for how to accumulate tracts based on user clicks
   observeEvent(input$map_shape_click, {
     
     if(input$map_shape_click$group == "base_map"){
-      #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new layer
+      #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new second layer
       selected$groups <- c(selected$groups, str_remove(input$map_shape_click$id, "^Tract ")) #remove "Tract " from start of id on the fly
       
       leaflet_pal <- colorFactor(palette_reactive(), selected_tracts_geo_reactive()$GEOID)
@@ -230,17 +243,17 @@ server <- function(input, output, session){
                     weight = 1,
                     color = "black",
                     stroke = TRUE,
-                    layerId = ~GEOID, #feeds into setdiff function to remove a tract
+                    layerId = ~GEOID, #feeds into later setdiff function to remove a tract
                     group = ~GEOID,
                     label = ~GEOID)
     } else if(input$map_shape_click$group == "hover_polygon") {
-      #when the user clicks on a tract that is highlighted by plotly already, clear that highlight polygon from the map
+      #when the user clicks on a tract that is highlighted by plotly already, clear that highlighted polygon from the hover_polygon layer
       
       proxy %>% clearGroup("hover_polygon")
       
     } else {
       #when the user clicks a tract that is already in selected$groups, remove that tract from selected$groups and remove it from the second layer
-
+      
       selected$groups <- setdiff(selected$groups, str_remove(input$map_shape_click$id, "^Tract "))
       
       proxy %>% clearGroup(input$map_shape_click$group)
@@ -248,6 +261,7 @@ server <- function(input, output, session){
     }
   }, ignoreInit = TRUE)
   
+  #when the user highlights a tract in the plotly graph, add a hover_polygon layer to the leaflet map with only that tract
   observeEvent(plotly_hover_event_reactive(), { 
     
     leaflet_pal <- colorFactor(palette_reactive(), selected_tracts_geo_reactive()$GEOID)
@@ -265,6 +279,7 @@ server <- function(input, output, session){
     
   })
   
+  #turn user-selected tracts into a df, join to sf df and data source df
   geoid_table_reactive <- reactive({
     
     req(length(selected$groups) > 0)
@@ -279,10 +294,12 @@ server <- function(input, output, session){
     
   })
   
+  #create table to show data about user-selected tracts
   output$geoid_table <- DT::renderDataTable({
     
     req(geoid_table_reactive())
     
+    #if the data has the category column, filter the categories based on user selection from input$categories
     if ("category" %in% names(data_source_reactive())){
       
       req(input$categories)
@@ -298,6 +315,7 @@ server <- function(input, output, session){
       
     }
     
+    #extract and clean variable name
     var_name <- x %>% 
       distinct(variable) %>% 
       pull()
@@ -306,9 +324,11 @@ server <- function(input, output, session){
       str_replace_all("_", " ") %>% 
       str_to_title()
     
+    #drop NAME column
     table_df <- x %>% 
       select(-c(NAME))
     
+    #clean column names
     table_df_names <- names(table_df) %>% 
       str_replace("moe", "Margin of Error") %>%
       str_replace("estimate", var_name) %>%
@@ -317,8 +337,10 @@ server <- function(input, output, session){
       str_replace("category", "Category") %>% 
       str_replace(var_name, var_name_proper)
     
+    #update column names
     names(table_df) <- table_df_names
     
+    #push to DT output
     table_df %>% 
       select(-variable) %>% 
       DT::datatable(options = list(autoWidth = TRUE,
@@ -330,17 +352,20 @@ server <- function(input, output, session){
   })
   
   
-  
+  #create graph that is dynamically generated based on user-selected data source and tracts
   output$bar_chart <- renderPlotly({
     
     req(geoid_table_reactive())
     
+    #determine if teh data is in percent units
     is_percent <- geoid_table_reactive() %>% 
       distinct(unit) %>% 
       pull() == "percent"
     
+    #extract column names
     column_names <- names(geoid_table_reactive())
     
+    #if the data has a margin of error and is in percent units, bound the moe between 0 and 1
     if ("moe" %in% column_names & is_percent) {
       
       x <- geoid_table_reactive() %>% 
@@ -351,6 +376,7 @@ server <- function(input, output, session){
                upper_bound = case_when(upper_bound > 1 ~ 1,
                                        upper_bound <= 1 ~ upper_bound))
       
+      #if it has margin of error, bound the lower margin at 0
     } else if ("moe" %in% column_names & !is_percent) {
       
       x <- geoid_table_reactive() %>% 
@@ -364,6 +390,7 @@ server <- function(input, output, session){
       
     }
     
+    #filter on category based on user-selected input$categories
     if ("category" %in% names(data_source_reactive())){
       
       req(input$categories)
@@ -379,6 +406,7 @@ server <- function(input, output, session){
       
     }
     
+    #make the graph. pass custom palette to make_graph function
     x %>% 
       make_graph(custom_palette = palette_reactive()) %>% 
       ggplotly() %>% 
@@ -387,6 +415,7 @@ server <- function(input, output, session){
     
   })
   
+  #capture which tract the user is hovering on in the plotly graph
   plotly_hover_event_reactive <- reactive({
     
     req(geoid_table_reactive())
@@ -394,6 +423,7 @@ server <- function(input, output, session){
     event_data("plotly_hover")
   })
   
+  #not sure that this is being used anymore
   output$hover <- renderPrint({
     
     req(plotly_hover_event_reactive())
@@ -402,6 +432,7 @@ server <- function(input, output, session){
     
   })
   
+  #if the data source has the category column, show UI element that user can use to filter categories
   output$category_filter <- renderUI({
     
     if("category" %in% names(data_source_reactive())){
