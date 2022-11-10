@@ -2,77 +2,6 @@ library(tidyverse)
 library(here)
 library(plotly)
 
-# get_housing_data <- function(){
-#   
-#   here("inputs/data_sources/housing_data.csv") %>% 
-#     read_csv(col_types = cols(
-#       GEOID = col_character(),
-#       variable = col_character(),
-#       year = col_double(),
-#       estimate = col_double(),
-#       tract_year = col_double(),
-#       unit = col_character()
-#     ))
-#   
-# }
-# 
-# # get_housing_data() %>% 
-# #   distinct(graph_type)
-# 
-# get_median_income <- function(x){
-#   
-#   here("inputs/data_sources/median_income.csv") %>% 
-#     read_csv(col_types = cols(
-#       GEOID = col_character(),
-#       year = col_integer(),
-#       variable = col_character(),
-#       estimate = col_double(),
-#       moe = col_double(),
-#       NAME = col_character(),
-#       tract_year = col_double(),
-#       unit = col_character()
-#     ))
-#   
-# }
-# 
-# get_commute_modes <- function(x){
-#   
-#   here("inputs/data_sources/commute_modes.csv") %>% 
-#     read_csv(col_types = cols(
-#       GEOID = col_character(),
-#       NAME = col_character(),
-#       year = col_integer(),
-#       variable = col_character(),
-#       category = col_character(),
-#       estimate = col_double(),
-#       moe = col_double(),
-#       tract_year = col_double(),
-#       unit = col_character()
-#     ))
-#   
-# }
-# 
-# get_owner_vs_renter_population <- function(x){
-#   
-#   here("inputs/data_sources/owner_vs_renter.csv") %>% 
-#     read_csv(col_types = cols(
-#       GEOID = col_character(),
-#       NAME = col_character(),
-#       year = col_integer(),
-#       variable = col_character(),
-#       estimate = col_double(),
-#       moe = col_double(),
-#       tract_year = col_double(),
-#       unit = col_character()
-#     ))
-#   
-# }
-
-# get_median_income() %>% 
-#   distinct(graph_type)
-
-data_source <- "housing"
-
 #routing function to get appropriate data source
 get_data <- function(x){
   
@@ -87,9 +16,6 @@ get_data <- function(x){
            col_types = list(GEOID = col_character()))
   
 }
-
-#get_data("housing")
-#get_data("median_income")
 
 #routing function to make graphs. graph type depends on how many yerrs are in scope
 make_graph <- function(target_df, custom_palette){
