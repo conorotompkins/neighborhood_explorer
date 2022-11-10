@@ -64,7 +64,8 @@ ui <- fluidPage(
            fluidRow(
              
              #shows leaflet map
-             leafletOutput("map")
+             leafletOutput("map",
+                           height = "300px")
              
            ),
            
