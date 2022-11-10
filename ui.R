@@ -35,19 +35,6 @@ ui <- fluidPage(
     
   ),
   
-  # div(
-  #   tags$ul(
-  #     tags$li(
-  #       h1(tags$a(style = "color: #2B2B2B", href = "https://ctompkins.netlify.app/", "Conor Tompkins"))
-  #     ),
-  #     tags$li(
-  #       h2(
-  #         a(href = "https://ctompkins.netlify.app/#posts", "posts")
-  #       )
-  #     )
-  #   )
-  # ),
-  
   fluidRow(
     
     column(width = 2,
@@ -93,11 +80,11 @@ ui <- fluidPage(
              
              #shows graph
              tabPanel(title = "Graph",
-                      plotlyOutput("bar_chart")),
+                      plotlyOutput("plotly_graph")),
              
              #shows summary table
              tabPanel(title = "Table",
-                      DT::dataTableOutput("geoid_table"))
+                      DT::dataTableOutput("summary_table"))
              
            )
            

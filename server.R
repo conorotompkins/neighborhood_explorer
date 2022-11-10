@@ -196,7 +196,7 @@ server <- function(input, output, session){
   })
   
   #create table to show data about user-selected tracts
-  output$geoid_table <- DT::renderDataTable({
+  output$summary_table <- DT::renderDataTable({
     
     req(geoid_table_reactive())
     
@@ -254,7 +254,7 @@ server <- function(input, output, session){
   
   
   #create graph that is dynamically generated based on user-selected data source and tracts
-  output$bar_chart <- renderPlotly({
+  output$plotly_graph <- renderPlotly({
     
     req(geoid_table_reactive())
     
