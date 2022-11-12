@@ -42,13 +42,19 @@ graph_single_year <- function(x, custom_palette){
     distinct(variable) %>% 
     pull()
   
+  x <- x %>%
+    mutate(custom_tooltip = str_c("GEOID: ", GEOID, "\n",
+                                  "Year: ", year, "\n",
+                                  variable, ": ", estimate,
+                                  sep = ""))
+  
   #if the data source has a category and margin of error, make a geom_errorbar plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
       facet_wrap(~category, scales = "free_x") +
@@ -65,7 +71,7 @@ graph_single_year <- function(x, custom_palette){
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
       geom_point(aes(x = estimate), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
@@ -82,7 +88,7 @@ graph_single_year <- function(x, custom_palette){
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID)) +
+      ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = estimate), size = .5, color = "black") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_fill_manual(values = custom_palette) +
@@ -109,13 +115,19 @@ graph_multiple_year <- function(x, custom_palette){
     distinct(year) %>% 
     pull()
   
+  x <- x %>%
+    mutate(custom_tooltip = str_c("GEOID: ", GEOID, "\n",
+                                  "Year: ", year, "\n",
+                                  variable, ": ", estimate,
+                                  sep = ""))
+  
   #if the data source has category and margin of error, make a ribbon plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, y = estimate, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID)) +
+      ggplot(aes(x = year, y = estimate, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
       geom_line() +
       geom_point(size = 1.5) +
@@ -134,7 +146,7 @@ graph_multiple_year <- function(x, custom_palette){
     
     x %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID)) +
+      ggplot(aes(x = year, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
       geom_line(aes(y = estimate), size = 1) +
       geom_point(aes(y = estimate), size = 2) +
@@ -153,7 +165,7 @@ graph_multiple_year <- function(x, custom_palette){
     
     x %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, y = estimate, color = GEOID, group = GEOID, customdata = GEOID)) +
+      ggplot(aes(x = year, y = estimate, color = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +

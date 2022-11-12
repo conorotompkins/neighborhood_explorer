@@ -310,7 +310,7 @@ server <- function(input, output, session){
     #make the graph. pass custom palette to make_graph function
     x %>% 
       make_graph(custom_palette = palette_reactive()) %>% 
-      ggplotly() %>% 
+      ggplotly(tooltip = "text") %>% 
       highlight(on = "plotly_hover", off = "plotly_doubleclick") %>% 
       layout(showlegend = FALSE)
     
