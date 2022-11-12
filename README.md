@@ -2,6 +2,8 @@
 
 An app for analyzing data at the neighborhood level
 
+[Available here](https://conorotompkins.shinyapps.io/neighborhood_explorer)
+
 ### Goals
 
 1.  Make it easier to easily compare statistics about census tracts
