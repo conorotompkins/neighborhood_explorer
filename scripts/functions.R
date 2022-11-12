@@ -7,7 +7,7 @@ get_data <- function(x){
   
   file_path <- switch(x,
          housing = "inputs/data_sources/housing_data.csv",
-         median_income = "inputs/data_sources/median_income.csv",
+         household_income = "inputs/data_sources/median_household_income.csv",
          commute_modes = "inputs/data_sources/commute_modes.csv",
          owner_vs_renter = "inputs/data_sources/owner_vs_renter.csv"
   )
