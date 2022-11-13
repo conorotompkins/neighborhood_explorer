@@ -6,11 +6,12 @@ library(sf)
 
 options(tigris_use_cache = TRUE)
 
-acs1_vars <- load_variables(2019, 'acs1') %>% 
-  mutate(across(c(label, concept), str_to_lower))
-
-acs1_vars %>% 
-  filter(str_detect(name, "B08301"))
+# acs1_vars <- load_variables(2019, 'acs1') %>% 
+#   mutate(across(c(label, concept), str_to_lower))
+# 
+# acs1_vars %>% 
+#   filter(str_detect(name, "B08301_")) |> 
+#   view()
 
 #label commute modes
 all_transit_vars <- c("Drove alone (car/truck/van)" = "B08301_003", 
@@ -41,6 +42,10 @@ c(2010:2019) %>%
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          tract_year = 2010) %>% 
-  select(GEOID, NAME, year, variable, category, estimate, moe, tract_year) %>% 
-  mutate(unit = "count") %>% 
+  group_by(GEOID, year) |> 
+  mutate(estimate_pct = estimate / sum(estimate)) %>%
+  ungroup() %>%
+  arrange(GEOID, year, desc(estimate)) %>%
+  select(GEOID, NAME, year, variable, category, estimate, moe, estimate_pct, tract_year) %>% 
+  mutate(unit = "count") %>%
   write_csv("inputs/data_sources/commute_modes.csv")
