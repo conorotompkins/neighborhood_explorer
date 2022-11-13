@@ -49,7 +49,7 @@ graph_single_year <- function(x, estimate_var, custom_palette){
                                   sep = ""))
   
   #if the data source has a category and margin of error, make a geom_errorbar plot and facet by category
-  if (all(c("category", "moe") %in% names(x))) {
+  if (all(c("category", "moe") %in% names(x)) & estimate_var == "estimate") {
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
@@ -66,7 +66,7 @@ graph_single_year <- function(x, estimate_var, custom_palette){
       theme_bw(base_size = 14)
     
   #if the data source has a category, make a geom_errorbar plot
-  } else if ("moe" %in% names(x)){
+  } else if ("moe" %in% names(x) & estimate_var == "estimate"){
     
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
@@ -90,8 +90,9 @@ graph_single_year <- function(x, estimate_var, custom_palette){
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
-      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
       scale_fill_manual(values = custom_palette) +
+      facet_wrap(vars(category), scales = "free_x") +
       labs(x = var_name,
            y = NULL) +
       guides(color = "none",
