@@ -258,6 +258,8 @@ server <- function(input, output, session){
     
     req(geoid_table_reactive())
     
+    print(input$pct_toggle)
+    
     #determine if teh data is in percent units
     is_percent <- geoid_table_reactive() %>% 
       distinct(unit) %>% 
@@ -309,7 +311,8 @@ server <- function(input, output, session){
     
     #make the graph. pass custom palette to make_graph function
     x %>% 
-      make_graph(custom_palette = palette_reactive()) %>% 
+      make_graph(estimate_var = input$pct_toggle,
+                 custom_palette = palette_reactive()) %>% 
       ggplotly(tooltip = "text") %>% 
       highlight(on = "plotly_hover", off = "plotly_doubleclick") %>% 
       layout(showlegend = FALSE)
@@ -352,4 +355,23 @@ server <- function(input, output, session){
     
   })
   
+  #if the data source has the estimate_pct column, show pct_toggle radio button
+  output$pct_toggle <- renderUI({
+    
+    if("estimate_pct" %in% names(data_source_reactive())){
+      
+      radioButtons(inputId = "pct_toggle",
+                   label = "Show in % terms",
+                   choices = c("Yes" = "estimate_pct",
+                               "No" = "estimate"),
+                   selected = "estimate")
+    } else {
+      
+      radioButtons(inputId = "pct_toggle",
+                   label = "Show in % terms",
+                   choices = c("No" = "estimate"),
+                   selected = "estimate")
+      
+    }
+  })
 }
