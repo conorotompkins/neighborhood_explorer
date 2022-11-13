@@ -18,7 +18,7 @@ get_data <- function(x){
 }
 
 #routing function to make graphs. graph type depends on how many yerrs are in scope
-make_graph <- function(target_df, custom_palette){
+make_graph <- function(target_df, estimate_var, custom_palette){
   
   graph_type <- target_df %>% 
     distinct(year) %>% 
@@ -28,14 +28,14 @@ make_graph <- function(target_df, custom_palette){
     pull(graph_type)
   
   switch(graph_type,
-         single_year = graph_single_year(target_df, custom_palette),
-         multiple_year = graph_multiple_year(target_df, custom_palette)
+         single_year = graph_single_year(target_df, estimate_var, custom_palette),
+         multiple_year = graph_multiple_year(target_df, estimate_var, custom_palette)
   )
   
 }
 
 #make a graph to show data with only one year in scope
-graph_single_year <- function(x, custom_palette){
+graph_single_year <- function(x, estimate_var, custom_palette){
   
   #extract variable name
   var_name <- x %>% 
@@ -56,7 +56,7 @@ graph_single_year <- function(x, custom_palette){
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
-      geom_point(aes(x = estimate), size = 2) +
+      geom_point(aes(x = .data[[estimate_var]]), size = 2) +
       facet_wrap(~category, scales = "free_x") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
@@ -73,7 +73,7 @@ graph_single_year <- function(x, custom_palette){
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar(aes(xmin = lower_bound, xmax = upper_bound)) +
-      geom_point(aes(x = estimate), size = 2) +
+      geom_point(aes(x = .data[[estimate_var]]), size = 2) +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
@@ -89,7 +89,7 @@ graph_single_year <- function(x, custom_palette){
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
-      geom_col(aes(x = estimate), size = .5, color = "black") +
+      geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
       scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_fill_manual(values = custom_palette) +
       labs(x = var_name,
@@ -103,7 +103,7 @@ graph_single_year <- function(x, custom_palette){
 }
 
 #routing function to make graphs when the data source has multiple years in scope
-graph_multiple_year <- function(x, custom_palette){
+graph_multiple_year <- function(x, estimate_var, custom_palette){
   
   #extract variable name
   var_name <- x %>% 
@@ -127,7 +127,7 @@ graph_multiple_year <- function(x, custom_palette){
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, y = estimate, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
+      ggplot(aes(x = year, y = .data[[estimate_var]], color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
       geom_line() +
       geom_point(size = 1.5) +
@@ -148,8 +148,8 @@ graph_multiple_year <- function(x, custom_palette){
       highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
-      geom_line(aes(y = estimate), size = 1) +
-      geom_point(aes(y = estimate), size = 2) +
+      geom_line(aes(y = .data[[estimate_var]]), size = 1) +
+      geom_point(aes(y = .data[[estimate_var]]), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
       scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
@@ -165,7 +165,7 @@ graph_multiple_year <- function(x, custom_palette){
     
     x %>% 
       highlight_key(~GEOID) %>% 
-      ggplot(aes(x = year, y = estimate, color = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
+      ggplot(aes(x = year, y = .data[[estimate_var]], color = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
