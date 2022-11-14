@@ -83,7 +83,7 @@ graph_single_year <- function(x, estimate_var, custom_palette){
       theme_bw(base_size = 14)
     
     #otherwise make a bar plot
-  } else {
+  } else if ("category" %in% names(x)) {
     
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
@@ -93,6 +93,21 @@ graph_single_year <- function(x, estimate_var, custom_palette){
       #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
       scale_fill_manual(values = custom_palette) +
       facet_wrap(vars(category), scales = "free_x") +
+      labs(x = var_name,
+           y = NULL) +
+      guides(color = "none",
+             fill = "none") +
+      theme_bw(base_size = 14)
+    
+  } else {
+    
+    x %>% 
+      mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
+      highlight_key(~GEOID) %>% 
+      ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
+      geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
+      #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
+      scale_fill_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
       guides(color = "none",
