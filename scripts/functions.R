@@ -6,10 +6,10 @@ library(plotly)
 get_data <- function(x){
   
   file_path <- switch(x,
-         housing = "inputs/data_sources/housing_data.csv",
-         household_income = "inputs/data_sources/median_household_income.csv",
-         commute_modes = "inputs/data_sources/commute_modes.csv",
-         owner_vs_renter = "inputs/data_sources/owner_vs_renter.csv"
+                      housing = "inputs/data_sources/housing_data.csv",
+                      household_income = "inputs/data_sources/median_household_income.csv",
+                      commute_modes = "inputs/data_sources/commute_modes.csv",
+                      owner_vs_renter = "inputs/data_sources/owner_vs_renter.csv"
   )
   
   read_csv(file_path,
@@ -65,7 +65,7 @@ graph_single_year <- function(x, estimate_var, custom_palette){
       guides(color = "none") +
       theme_bw(base_size = 14)
     
-  #if the data source has a category, make a geom_errorbar plot
+    #if the data source has a category, make a geom_errorbar plot
   } else if ("moe" %in% names(x) & estimate_var == "estimate"){
     
     x %>% 
@@ -122,8 +122,8 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
                                   variable, ": ", estimate,
                                   sep = ""))
   
-  #if the data source has category and margin of error, make a ribbon plot and facet by category
-  if (all(c("category", "moe") %in% names(x))) {
+  #if the data source has category and margin of error and is in unit terms, make a ribbon plot and facet by category
+  if (all(c("category", "moe") %in% names(x)) & estimate_var == "estimate") {
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
@@ -142,8 +142,8 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
              fill = "none") +
       theme_bw()
     
-  #if the data source has category, make a ribbon plot
-  } else if ("moe" %in% names(x)){
+    #if the data source has category and is in unit terms, make a ribbon plot
+  } else if ("moe" %in% names(x) & estimate_var == "estimate"){
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -161,7 +161,23 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
              fill = "none") +
       theme_bw()
     
-  #otherwise make a line graph
+    #otherwise make a line graph
+  } else if ("category" %in% names(x)){
+    
+    x %>% 
+      highlight_key(~GEOID) %>% 
+      ggplot(aes(x = year, y = .data[[estimate_var]], color = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
+      geom_line(size = 1) +
+      geom_point(size = 2) +
+      facet_wrap(vars(category), scales = "free_y") +
+      scale_x_continuous(breaks = custom_breaks) +
+      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      scale_color_manual(values = custom_palette) +
+      labs(x = "Year",
+           y = var_name) +
+      guides(color = "none") +
+      theme_bw()
+    
   } else {
     
     x %>% 
@@ -170,7 +186,7 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
       geom_line(size = 1) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
-      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
@@ -178,5 +194,4 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
       theme_bw()
     
   }
-  
 }
