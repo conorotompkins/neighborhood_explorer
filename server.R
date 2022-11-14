@@ -358,6 +358,8 @@ server <- function(input, output, session){
   #if the data source has the estimate_pct column, show pct_toggle radio button
   output$pct_toggle <- renderUI({
     
+    #causes error when switching from showing var with estimate_pct to var without estimate_pct
+    #Error in [[: Column `estimate_pct` not found in `.data`.
     if("estimate_pct" %in% names(data_source_reactive())){
       
       radioButtons(inputId = "pct_toggle",
