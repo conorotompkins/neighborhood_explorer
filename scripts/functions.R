@@ -176,7 +176,7 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
              fill = "none") +
       theme_bw()
     
-    #otherwise make a line graph
+    #otherwise make a line graph facted by category
   } else if ("category" %in% names(x)){
     
     x %>% 
@@ -193,6 +193,7 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
       guides(color = "none") +
       theme_bw()
     
+    #otherwise make a line graph
   } else {
     
     x %>% 
