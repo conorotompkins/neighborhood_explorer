@@ -18,7 +18,7 @@ get_data <- function(x){
 }
 
 #routing function to make graphs. graph type depends on how many yerrs are in scope
-make_graph <- function(target_df, estimate_var, custom_palette){
+make_graph <- function(target_df, estimate_var, moe_flag, custom_palette){
   
   graph_type <- target_df %>% 
     distinct(year) %>% 
@@ -29,7 +29,7 @@ make_graph <- function(target_df, estimate_var, custom_palette){
   
   switch(graph_type,
          single_year = graph_single_year(target_df, estimate_var, custom_palette),
-         multiple_year = graph_multiple_year(target_df, estimate_var, custom_palette)
+         multiple_year = graph_multiple_year(target_df, estimate_var, moe_flag, custom_palette)
   )
   
 }
@@ -119,7 +119,7 @@ graph_single_year <- function(x, estimate_var, custom_palette){
 }
 
 #routing function to make graphs when the data source has multiple years in scope
-graph_multiple_year <- function(x, estimate_var, custom_palette){
+graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
   
   #extract variable name
   var_name <- x %>% 
@@ -131,20 +131,27 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
     distinct(year) %>% 
     pull()
   
+  geom_ribbon_switch <- function(x){
+    print(x)
+    switch(x,
+           yes = geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2),
+           no = NULL)
+  }
+  
   x <- x %>%
     mutate(custom_tooltip = str_c("GEOID: ", GEOID, "\n",
                                   "Year: ", year, "\n",
                                   variable, ": ", estimate,
                                   sep = ""))
   
-  #if the data source has category and margin of error and is in unit terms, make a ribbon plot and facet by category
-  if (all(c("category", "moe") %in% names(x)) & estimate_var == "estimate") {
-    
+  #if the data source has category and margin of error, make a ribbon plot and facet by category
+  if (all(c("category", "moe") %in% names(x))) {
+    print("test1")
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, y = .data[[estimate_var]], color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
-      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
+      geom_ribbon_switch(moe_flag) +
       geom_line() +
       geom_point(size = 1.5) +
       facet_wrap(~category, scales = "free_y") +
@@ -158,12 +165,12 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
       theme_bw()
     
     #if the data source has category and is in unit terms, make a ribbon plot
-  } else if ("moe" %in% names(x) & estimate_var == "estimate"){
-    
+  } else if ("moe" %in% names(x)){
+    print("test2")
     x %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, color = GEOID, fill = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
-      geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), alpha = .2) +
+      geom_ribbon_switch(moe_flag) +
       geom_line(aes(y = .data[[estimate_var]]), size = 1) +
       geom_point(aes(y = .data[[estimate_var]]), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
@@ -178,7 +185,7 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
     
     #otherwise make a line graph facted by category
   } else if ("category" %in% names(x)){
-    
+    print("test3")
     x %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, y = .data[[estimate_var]], color = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
@@ -195,7 +202,7 @@ graph_multiple_year <- function(x, estimate_var, custom_palette){
     
     #otherwise make a line graph
   } else {
-    
+    print("test4")
     x %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(x = year, y = .data[[estimate_var]], color = GEOID, group = GEOID, customdata = GEOID, text = custom_tooltip)) +
