@@ -381,7 +381,9 @@ server <- function(input, output, session){
   
   output$toggle_moe <- renderUI({
     
-    if("moe" %in% names(data_source_reactive())){
+    req(input$pct_toggle)
+    
+    if("moe" %in% names(data_source_reactive()) & input$pct_toggle == "estimate"){
       
       radioButtons(inputId = "toggle_moe",
                    label = "Show margin of error",
