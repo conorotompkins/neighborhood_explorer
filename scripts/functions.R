@@ -27,8 +27,6 @@ make_graph <- function(target_df, estimate_var, moe_flag, custom_palette){
                                   n > 1 ~ "multiple_year")) %>% 
     pull(graph_type)
   
-  print(graph_type)
-  
   switch(graph_type,
          single_year = graph_single_year(target_df, estimate_var, moe_flag, custom_palette),
          multiple_year = graph_multiple_year(target_df, estimate_var, moe_flag, custom_palette)
@@ -61,8 +59,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
   #if the data source has a category and margin of error, make a geom_errorbar plot and facet by category
   if (all(c("category", "moe") %in% names(x)) & estimate_var == "estimate") {
     print('type1')
-    print(moe_flag)
-    print(custom_palette)
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
@@ -81,7 +77,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     #if the data source has a category, make a geom_errorbar plot
   } else if ("moe" %in% names(x) & estimate_var == "estimate"){
     print('type2')
-    print(moe_flag)
     
     x %>% 
       mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
@@ -164,8 +159,6 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
   #if the data source has category and margin of error, make a ribbon plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
     print("type1")
-    print(moe_flag)
-    print(custom_palette)
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
