@@ -58,7 +58,11 @@ ui <- fluidPage(
                        sep = ""),
            
            #user can select which categories are in scope
-           uiOutput("category_filter")
+           uiOutput("category_filter"),
+           
+           uiOutput("pct_toggle"),
+           
+           uiOutput("toggle_moe")
            
     ),
     

@@ -256,7 +256,7 @@ server <- function(input, output, session){
   #create graph that is dynamically generated based on user-selected data source and tracts
   output$plotly_graph <- renderPlotly({
     
-    req(geoid_table_reactive())
+    req(geoid_table_reactive(), input$pct_toggle, input$toggle_moe)
     
     #determine if teh data is in percent units
     is_percent <- geoid_table_reactive() %>% 
@@ -309,7 +309,9 @@ server <- function(input, output, session){
     
     #make the graph. pass custom palette to make_graph function
     x %>% 
-      make_graph(custom_palette = palette_reactive()) %>% 
+      make_graph(estimate_var = input$pct_toggle,
+                 moe_flag = input$toggle_moe,
+                 custom_palette = palette_reactive()) %>% 
       ggplotly(tooltip = "text") %>% 
       highlight(on = "plotly_hover", off = "plotly_doubleclick") %>% 
       layout(showlegend = FALSE)
@@ -352,4 +354,47 @@ server <- function(input, output, session){
     
   })
   
+  #if the data source has the estimate_pct column, show pct_toggle radio button
+  output$pct_toggle <- renderUI({
+    
+    #causes error when switching from showing var with estimate_pct to var without estimate_pct
+    #Error in [[: Column `estimate_pct` not found in `.data`.
+    if("estimate_pct" %in% names(data_source_reactive())){
+      
+      radioButtons(inputId = "pct_toggle",
+                   label = "Show in % terms",
+                   choices = c("Yes" = "estimate_pct",
+                               "No" = "estimate"),
+                   selected = "estimate")
+    } else {
+      
+      radioButtons(inputId = "pct_toggle",
+                   label = "Show in % terms",
+                   choices = c("No" = "estimate"),
+                   selected = "estimate")
+      
+    }
+  })
+  
+  output$toggle_moe <- renderUI({
+    
+    req(input$pct_toggle)
+    
+    if("moe" %in% names(data_source_reactive()) & input$pct_toggle == "estimate"){
+      
+      radioButtons(inputId = "toggle_moe",
+                   label = "Show margin of error",
+                   choices = c("Yes" = "yes",
+                               "No" = "no"),
+                   selected = "no")
+    } else {
+      
+      radioButtons(inputId = "toggle_moe",
+                   label = "Show margin of error",
+                   choices = c("No" = "no"),
+                   selected = "no")
+      
+    }
+    
+  })
 }
