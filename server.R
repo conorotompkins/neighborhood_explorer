@@ -307,9 +307,6 @@ server <- function(input, output, session){
       
     }
     
-    print(names(data_source_reactive()))
-    print(input$toggle_moe)
-    
     #make the graph. pass custom palette to make_graph function
     x %>% 
       make_graph(estimate_var = input$pct_toggle,
