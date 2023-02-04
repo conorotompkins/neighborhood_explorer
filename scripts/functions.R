@@ -61,9 +61,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     print('type1')
     
     x |> 
-      mutate(category = fct_reorder(category, estimate, sum, .desc = TRUE)
-             #GEOID = fct_reorder(GEOID, estimate, sum, .desc = FALSE)
-             ) |>  
+      mutate(category = fct_reorder(category, estimate, sum, .desc = TRUE)) |>  
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar_switch(moe_flag) +
@@ -81,7 +79,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     print('type2')
     
     x %>% 
-      #mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar_switch(moe_flag) +
@@ -99,7 +96,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     print('type3')
     
     x %>% 
-      #mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
@@ -116,7 +112,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     print('type4')
     
     x %>% 
-      #mutate(GEOID = fct_reorder(GEOID, estimate)) %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
