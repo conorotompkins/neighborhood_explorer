@@ -51,25 +51,33 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     
   }
   
-  axis_units <- function(var, axis_type){
+  #print(x)
+  unit <- x |> 
+    distinct(unit) |> 
+    pull()
+  
+  axis_units <- function(var, unit, axis_type){
+    print(var)
+    print(unit)
+    print(axis_type)
     
-   if (var == "estimate" & axis_type == "x"){
-     
-     scale_x_comma()
-     
-   } else if (var == "estimate" & axis_type == "y"){
-     
-     scale_y_comma()
-     
-   } else if (var == "estimate_pct" & axis_type == "x"){
-     
-     scale_x_percent(accuracy = NULL)
-     
-   } else {
-     
-     scale_y_percent(accuracy = NULL)
-     
-   }
+    if ((var == "estimate_pct" | unit == "percent") & axis_type == "x"){
+      print("x percent")
+      scale_x_percent()
+      
+    } else if ((var == "estimate_pct" | unit == "percent") & axis_type == "y"){
+      print("y percent")
+      scale_y_percent()
+      
+    } else if (var == "estimate" & axis_type == "x"){
+      print("x comma")
+      scale_x_comma()
+      
+    } else {
+      print("y comma")
+      scale_y_comma()
+      
+    }
     
   }
   
@@ -91,7 +99,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_point(aes(x = .data[[estimate_var]]), size = 2) +
       facet_wrap(~category, scales = "free_x") +
       #scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
-      axis_units(estimate_var, "x") +
+      axis_units(estimate_var, unit, axis_type = "x") +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
@@ -107,7 +115,8 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar_switch(moe_flag) +
       geom_point(aes(x = .data[[estimate_var]]), size = 2) +
-      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      #scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(estimate_var, unit, "x") +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
