@@ -1,4 +1,5 @@
 library(tidyverse)
+library(hrbrthemes)
 library(here)
 library(plotly)
 
@@ -50,6 +51,28 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     
   }
   
+  axis_units <- function(var, axis_type){
+    
+   if (var == "estimate" & axis_type == "x"){
+     
+     scale_x_comma()
+     
+   } else if (var == "estimate" & axis_type == "y"){
+     
+     scale_y_comma()
+     
+   } else if (var == "estimate_pct" & axis_type == "x"){
+     
+     scale_x_percent(accuracy = NULL)
+     
+   } else {
+     
+     scale_y_percent(accuracy = NULL)
+     
+   }
+    
+  }
+  
   x <- x %>%
     mutate(custom_tooltip = str_c("GEOID: ", GEOID, "\n",
                                   "Year: ", year, "\n",
@@ -57,7 +80,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
                                   sep = ""))
   
   #if the data source has a category and margin of error, make a geom_errorbar plot and facet by category
-  if (all(c("category", "moe") %in% names(x)) & estimate_var == "estimate") {
+  if (all(c("category", "moe") %in% names(x))) {
     print('type1')
     
     x |> 
@@ -67,7 +90,8 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_errorbar_switch(moe_flag) +
       geom_point(aes(x = .data[[estimate_var]]), size = 2) +
       facet_wrap(~category, scales = "free_x") +
-      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      #scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(estimate_var, "x") +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
