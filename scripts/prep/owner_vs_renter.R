@@ -48,7 +48,7 @@ census_data_raw <- c(2010:2019) %>%
 #transform data so it is expressed in terms of % of population in owner-occupied housing
 census_data <- census_data_raw %>% 
   filter(category == "Population in owner-occupied housing") %>% 
-  mutate(estimate_pct = estimate / summary_est,
+  mutate(estimate_pct = round(estimate / summary_est, 2),
          moe_pct = moe / estimate,
          moe_pct = case_when(is.infinite(moe_pct) ~ 0,
                              is.finite(moe_pct) ~ moe_pct)) %>% 
