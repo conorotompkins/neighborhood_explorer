@@ -10,6 +10,8 @@ options(tigris_use_cache = TRUE,
 
 acs_vars <- load_variables(year = 2021, dataset = "acs5")
 
+dec_vars <- load_variables(year = 2020, dataset = "sf1")
+
 glimpse(acs_vars)
 
 acs_vars |>
@@ -26,7 +28,7 @@ acs_vars %>%
   view()
 
 #get census data for years 2010 through 2019
-test <- get_acs(geography = "tract",
+test <- get_decennial(geography = "tract",
         variables = "B25077_001",
         year = 2010,
         state = "PA",
@@ -40,11 +42,11 @@ test |>
   geom_sf() +
   scale_fill_viridis_c()
 
-census_data_raw <- c(2010:2019) %>% 
+census_data_raw <- c(2010:2020) %>% 
   set_names() %>% 
   map_dfr({~get_acs(geography = "tract",
                     variables = "B25077_001",
-                    year = 2010,
+                    year = .x,
                     state = "PA",
                     county = "Allegheny County",
                     geometry = TRUE)},
@@ -54,7 +56,10 @@ census_data_raw <- c(2010:2019) %>%
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          tract_year = 2010) |> #tract year defines which decade the tract was created for
-  select(GEOID, tract_year, NAME, year, variable, category, estimate, moe)
+  select(GEOID, tract_year, NAME, year, variable, category, estimate, moe) |> 
+  mutate(unit = "dollars")
+
+glimpse(census_data_raw)
 
 census_data_raw |> 
   ggplot(aes(fill = estimate)) +
