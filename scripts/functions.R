@@ -177,6 +177,35 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
            no = NULL)
   }
   
+  unit <- x |> 
+    distinct(unit) |> 
+    pull()
+  
+  axis_units <- function(var, unit, axis_type){
+    print(var)
+    print(unit)
+    print(axis_type)
+    
+    if ((var == "estimate_pct" | unit == "percent") & axis_type == "x"){
+      print("x percent")
+      scale_x_percent()
+      
+    } else if ((var == "estimate_pct" | unit == "percent") & axis_type == "y"){
+      print("y percent")
+      scale_y_percent()
+      
+    } else if (var == "estimate" & axis_type == "x"){
+      print("x comma")
+      scale_x_comma()
+      
+    } else {
+      print("y comma")
+      scale_y_comma()
+      
+    }
+    
+  }
+  
   x <- x %>%
     mutate(custom_tooltip = str_c("GEOID: ", GEOID, "\n",
                                   "Year: ", year, "\n",
@@ -215,7 +244,8 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_line(aes(y = .data[[estimate_var]]), size = 1) +
       geom_point(aes(y = .data[[estimate_var]]), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
-      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       scale_fill_manual(values = custom_palette) +
       labs(x = "Year",
