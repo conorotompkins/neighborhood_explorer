@@ -185,7 +185,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
   
   #if the data source has category and margin of error, make a ribbon plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
-    print("type1")
+    print("multi year type1")
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
@@ -206,7 +206,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #if the data source has category and is in unit terms, make a ribbon plot
   } else if ("moe" %in% names(x)){
-    print('type2')
+    print('multi year type2')
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -226,7 +226,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #otherwise make a line graph facted by category
   } else if ("category" %in% names(x)){
-    print('type3')
+    print('multi year type3')
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -244,7 +244,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #otherwise make a line graph
   } else {
-    print('type4')
+    print('multi year type4')
     
     x %>% 
       highlight_key(~GEOID) %>% 
