@@ -283,6 +283,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
       #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
