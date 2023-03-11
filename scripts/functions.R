@@ -98,7 +98,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_errorbar_switch(moe_flag) +
       geom_point(aes(x = .data[[estimate_var]]), size = 2) +
       facet_wrap(~category, scales = "free_x") +
-      #scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       axis_units(var = estimate_var, unit = unit, axis_type = "x") +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
@@ -115,7 +114,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar_switch(moe_flag) +
       geom_point(aes(x = .data[[estimate_var]]), size = 2) +
-      #scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
       axis_units(var = estimate_var, unit = unit, "x") +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
@@ -132,7 +130,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
-      #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
       scale_fill_manual(values = custom_palette) +
       facet_wrap(vars(category), scales = "free_x") +
       labs(x = var_name,
@@ -148,7 +145,6 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
-      #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
       axis_units(var = estimate_var, unit = unit, axis_type = "x") +
       scale_fill_manual(values = custom_palette) +
       labs(x = var_name,
