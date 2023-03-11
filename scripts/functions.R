@@ -149,6 +149,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
       #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
+      axis_units(estimate_var, unit, "x") +
       scale_fill_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
