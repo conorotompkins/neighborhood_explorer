@@ -224,7 +224,6 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_line() +
       geom_point(size = 1.5) +
       facet_wrap(~category, scales = "free_y") +
-      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       scale_fill_manual(values = custom_palette) +
@@ -245,7 +244,6 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_line(aes(y = .data[[estimate_var]]), size = 1) +
       geom_point(aes(y = .data[[estimate_var]]), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
-      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       scale_fill_manual(values = custom_palette) +
@@ -266,7 +264,6 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_point(size = 2) +
       facet_wrap(vars(category), scales = "free_y") +
       scale_x_continuous(breaks = custom_breaks) +
-      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
@@ -283,7 +280,6 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_line(size = 1) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
-      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       labs(x = "Year",
