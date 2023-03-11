@@ -57,25 +57,32 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     pull()
   
   axis_units <- function(var, unit, axis_type){
-    print(var)
-    print(unit)
-    print(axis_type)
     
-    if ((var == "estimate_pct" | unit == "percent") & axis_type == "x"){
-      print("x percent")
-      scale_x_percent()
+    if (axis_type == "x"){
       
-    } else if ((var == "estimate_pct" | unit == "percent") & axis_type == "y"){
-      print("y percent")
-      scale_y_percent()
+      if (unit == "dollars") {
+        
+        scale_x_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_x_percent()
+        
+      } else {scale_x_comma()}
       
-    } else if (var == "estimate" & axis_type == "x"){
-      print("x comma")
-      scale_x_comma()
+    }
+    
+    else {
       
-    } else {
-      print("y comma")
-      scale_y_comma()
+      if (unit == "dollars") {
+        
+        scale_y_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_y_percent()
+        
+      } else {scale_y_comma()}
       
     }
     
@@ -182,25 +189,32 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
     pull()
   
   axis_units <- function(var, unit, axis_type){
-    print(var)
-    print(unit)
-    print(axis_type)
     
-    if ((var == "estimate_pct" | unit == "percent") & axis_type == "x"){
-      print("x percent")
-      scale_x_percent()
+    if (axis_type == "x"){
       
-    } else if ((var == "estimate_pct" | unit == "percent") & axis_type == "y"){
-      print("y percent")
-      scale_y_percent()
+      if (unit == "dollars") {
+        
+        scale_x_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_x_percent()
+        
+      } else {scale_x_comma()}
       
-    } else if (var == "estimate" & axis_type == "x"){
-      print("x comma")
-      scale_x_comma()
+    }
+    
+    else {
       
-    } else {
-      print("y comma")
-      scale_y_comma()
+      if (unit == "dollars") {
+        
+        scale_y_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_y_percent()
+        
+      } else {scale_y_comma()}
       
     }
     
