@@ -89,7 +89,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
   
   #if the data source has a category and margin of error, make a geom_errorbar plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
-    print('type1')
+    print('single year type1')
     
     x |> 
       mutate(category = fct_reorder(category, estimate, sum, .desc = TRUE)) |>  
@@ -108,7 +108,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #if the data source has a category, make a geom_errorbar plot
   } else if ("moe" %in% names(x) & estimate_var == "estimate"){
-    print('type2')
+    print('single year type2')
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -126,7 +126,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #otherwise make a bar plot
   } else if ("category" %in% names(x)) {
-    print('type3')
+    print('single year type3')
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -142,7 +142,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       theme_bw(base_size = 14)
     
   } else {
-    print('type4')
+    print('single year type4')
     
     x %>% 
       highlight_key(~GEOID) %>% 
