@@ -1,4 +1,5 @@
 library(tidyverse)
+library(hrbrthemes)
 library(here)
 library(plotly)
 
@@ -50,6 +51,43 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     
   }
   
+  #print(x)
+  unit <- x |> 
+    distinct(unit) |> 
+    pull()
+  
+  axis_units <- function(var, unit, axis_type){
+    
+    if (axis_type == "x"){
+      
+      if (unit == "dollars") {
+        
+        scale_x_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_x_percent()
+        
+      } else {scale_x_comma()}
+      
+    }
+    
+    else {
+      
+      if (unit == "dollars") {
+        
+        scale_y_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_y_percent()
+        
+      } else {scale_y_comma()}
+      
+    }
+    
+  }
+  
   x <- x %>%
     mutate(custom_tooltip = str_c("GEOID: ", GEOID, "\n",
                                   "Year: ", year, "\n",
@@ -57,8 +95,8 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
                                   sep = ""))
   
   #if the data source has a category and margin of error, make a geom_errorbar plot and facet by category
-  if (all(c("category", "moe") %in% names(x)) & estimate_var == "estimate") {
-    print('type1')
+  if (all(c("category", "moe") %in% names(x))) {
+    print('single year type1')
     
     x |> 
       mutate(category = fct_reorder(category, estimate, sum, .desc = TRUE)) |>  
@@ -67,7 +105,7 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_errorbar_switch(moe_flag) +
       geom_point(aes(x = .data[[estimate_var]]), size = 2) +
       facet_wrap(~category, scales = "free_x") +
-      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(var = estimate_var, unit = unit, axis_type = "x") +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
@@ -76,14 +114,14 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #if the data source has a category, make a geom_errorbar plot
   } else if ("moe" %in% names(x) & estimate_var == "estimate"){
-    print('type2')
+    print('single year type2')
     
     x %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, color = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_errorbar_switch(moe_flag) +
       geom_point(aes(x = .data[[estimate_var]]), size = 2) +
-      scale_x_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(var = estimate_var, unit = unit, "x") +
       scale_color_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
@@ -93,13 +131,12 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #otherwise make a bar plot
   } else if ("category" %in% names(x)) {
-    print('type3')
+    print('single year type3')
     
     x %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
-      #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
       scale_fill_manual(values = custom_palette) +
       facet_wrap(vars(category), scales = "free_x") +
       labs(x = var_name,
@@ -109,13 +146,13 @@ graph_single_year <- function(x, estimate_var, moe_flag, custom_palette){
       theme_bw(base_size = 14)
     
   } else {
-    print('type4')
+    print('single year type4')
     
     x %>% 
       highlight_key(~GEOID) %>% 
       ggplot(aes(y = GEOID, fill = GEOID, customdata = GEOID, text = custom_tooltip)) +
       geom_col(aes(x = .data[[estimate_var]]), size = .5, color = "black") +
-      #placeholder for scale_x_continuous_switch that deals with comma and pct format depending on estimate_var
+      axis_units(var = estimate_var, unit = unit, axis_type = "x") +
       scale_fill_manual(values = custom_palette) +
       labs(x = var_name,
            y = NULL) +
@@ -147,6 +184,42 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
            no = NULL)
   }
   
+  unit <- x |> 
+    distinct(unit) |> 
+    pull()
+  
+  axis_units <- function(var, unit, axis_type){
+    
+    if (axis_type == "x"){
+      
+      if (unit == "dollars") {
+        
+        scale_x_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_x_percent()
+        
+      } else {scale_x_comma()}
+      
+    }
+    
+    else {
+      
+      if (unit == "dollars") {
+        
+        scale_y_comma(prefix = "$")
+        
+      } else if (var == "estimate_pct" | unit == "percent") {
+        
+        scale_y_percent()
+        
+      } else {scale_y_comma()}
+      
+    }
+    
+  }
+  
   x <- x %>%
     mutate(custom_tooltip = str_c("GEOID: ", GEOID, "\n",
                                   "Year: ", year, "\n",
@@ -155,7 +228,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
   
   #if the data source has category and margin of error, make a ribbon plot and facet by category
   if (all(c("category", "moe") %in% names(x))) {
-    print("type1")
+    print("multi year type1")
     
     x %>% 
       mutate(category = fct_reorder(category, estimate, .desc = T)) %>% 
@@ -165,7 +238,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_line() +
       geom_point(size = 1.5) +
       facet_wrap(~category, scales = "free_y") +
-      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       scale_fill_manual(values = custom_palette) +
       labs(x = "Year",
@@ -176,7 +249,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #if the data source has category and is in unit terms, make a ribbon plot
   } else if ("moe" %in% names(x)){
-    print('type2')
+    print('multi year type2')
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -185,7 +258,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_line(aes(y = .data[[estimate_var]]), size = 1) +
       geom_point(aes(y = .data[[estimate_var]]), size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
-      scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       scale_fill_manual(values = custom_palette) +
       labs(x = "Year",
@@ -196,7 +269,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #otherwise make a line graph facted by category
   } else if ("category" %in% names(x)){
-    print('type3')
+    print('multi year type3')
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -205,7 +278,6 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_point(size = 2) +
       facet_wrap(vars(category), scales = "free_y") +
       scale_x_continuous(breaks = custom_breaks) +
-      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
       scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
@@ -214,7 +286,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
     
     #otherwise make a line graph
   } else {
-    print('type4')
+    print('multi year type4')
     
     x %>% 
       highlight_key(~GEOID) %>% 
@@ -222,7 +294,7 @@ graph_multiple_year <- function(x, estimate_var, moe_flag, custom_palette){
       geom_line(size = 1) +
       geom_point(size = 2) +
       scale_x_continuous(breaks = custom_breaks) +
-      #scale_y_continuous(labels = scales::label_number(big.mark = ",")) +
+      axis_units(var = estimate_var, unit = unit, axis_type = "y") +
       scale_color_manual(values = custom_palette) +
       labs(x = "Year",
            y = var_name) +
