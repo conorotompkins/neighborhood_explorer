@@ -24,8 +24,8 @@ all_transit_vars <- c("Drove alone (car/truck/van)" = "B08301_003",
                       "Other means" = "B08301_020",
                       "Worked from home" = "B08301_021")
 
-acs1_vars %>% 
-  filter(name %in% all_transit_vars)
+# acs1_vars %>% 
+#   filter(name %in% all_transit_vars)
 
 c(2010:2019) %>% 
   set_names() %>% 
@@ -43,7 +43,7 @@ c(2010:2019) %>%
          graph_type = "discrete",
          tract_year = 2010) %>% 
   group_by(GEOID, year) |> 
-  mutate(estimate_pct = estimate / sum(estimate)) %>%
+  mutate(estimate_pct = round(estimate / sum(estimate), 2)) %>%
   ungroup() %>%
   arrange(GEOID, year, desc(estimate)) %>%
   select(GEOID, NAME, year, variable, category, estimate, moe, estimate_pct, tract_year) %>% 
