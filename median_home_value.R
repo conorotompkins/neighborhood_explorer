@@ -3,6 +3,9 @@
 library(tidyverse)
 library(tidycensus)
 library(sf)
+library(hrbrthemes)
+
+theme_set(theme_ipsum())
 
 options(tigris_use_cache = TRUE,
         scipen = 999,
@@ -52,7 +55,7 @@ census_data_raw <- c(2010:2020) %>%
                     geometry = TRUE)},
       .id = "year") |> 
   rename(category = variable) |> 
-  mutate(variable = "Owner-reported median home value",
+  mutate(variable = "Owner-estimated median home value",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          tract_year = 2010) |> #tract year defines which decade the tract was created for
@@ -67,3 +70,9 @@ census_data_raw |>
   facet_wrap(vars(year)) +
   scale_fill_viridis_c() +
   theme_void()
+
+census_data_raw |> 
+  filter(GEOID %in% c("42003472200", "42003472100", "42003472300", "42003472400")) |> 
+  ggplot(aes(year, estimate)) +
+  geom_line(aes(group = GEOID), alpha = .3) +
+  geom_smooth(aes(group = 1))
