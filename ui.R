@@ -47,7 +47,8 @@ ui <- fluidPage(
                           choices = c("Household Income" = "household_income", 
                                       "Housing Units" = "housing", 
                                       "Commute Mode" = "commute_modes", 
-                                      "Home Ownership" = "owner_vs_renter")),
+                                      "Home Ownership" = "owner_vs_renter",
+                                      "Owner-estimated home value" = "owner_estimated_home_value")),
            
            #user selects years in scope
            sliderInput(inputId = "year_slider",
