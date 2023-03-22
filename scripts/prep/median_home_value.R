@@ -52,17 +52,20 @@ census_data_raw <- c(2010:2020) %>%
                     year = .x,
                     state = "PA",
                     county = "Allegheny County",
-                    geometry = TRUE)},
+                    geometry = FALSE)},
       .id = "year") |> 
-  rename(category = variable) |> 
+  #rename(category = variable) |> 
   mutate(variable = "Owner-estimated median home value",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
          tract_year = 2010) |> #tract year defines which decade the tract was created for
-  select(GEOID, tract_year, NAME, year, variable, category, estimate, moe) |> 
+  select(GEOID, tract_year, NAME, year, variable, estimate, moe) |> 
   mutate(unit = "dollars")
 
 glimpse(census_data_raw)
+
+census_data_raw %>% 
+  write_csv("inputs/data_sources/median_owner_estimated_home_value.csv")
 
 census_data_raw |> 
   ggplot(aes(fill = estimate)) +
