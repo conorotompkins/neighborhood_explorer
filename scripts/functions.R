@@ -10,7 +10,8 @@ get_data <- function(x){
                       housing = "inputs/data_sources/housing_data.csv",
                       household_income = "inputs/data_sources/median_household_income.csv",
                       commute_modes = "inputs/data_sources/commute_modes.csv",
-                      owner_vs_renter = "inputs/data_sources/owner_vs_renter.csv"
+                      owner_vs_renter = "inputs/data_sources/owner_vs_renter.csv",
+                      owner_estimated_home_value = "inputs/data_sources/median_owner_estimated_home_value.csv"
   )
   
   read_csv(file_path,
