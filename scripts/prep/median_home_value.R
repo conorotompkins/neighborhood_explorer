@@ -11,32 +11,33 @@ options(tigris_use_cache = TRUE,
         scipen = 999,
         digits = 4)
 
-acs_vars <- load_variables(year = 2021, dataset = "acs5")
-
-dec_vars <- load_variables(year = 2020, dataset = "sf1")
-
-glimpse(acs_vars)
-
-acs_vars |>
-  filter(name == "B25077_001")
-
-acs_vars %>%
-  #filter(geography == "tract") %>%
-  filter(str_detect(concept, "MEDIAN VALUE")) %>%
-  #distinct(concept, geography) %>%
-  view()
-
-acs_vars %>%
-  filter(name == "B25077_001") %>%
-  view()
+# acs_vars <- load_variables(year = 2021, dataset = "acs5")
+# 
+# dec_vars <- load_variables(year = 2020, dataset = "sf1")
+# 
+# glimpse(acs_vars)
+# 
+# acs_vars |>
+#   filter(name == "B25077_001")
+# 
+# acs_vars %>%
+#   #filter(geography == "tract") %>%
+#   filter(str_detect(concept, "MEDIAN VALUE")) %>%
+#   #distinct(concept, geography) %>%
+#   view()
+# 
+# acs_vars %>%
+#   filter(name == "B25077_001") %>%
+#   view()
 
 #get census data for years 2010 through 2019
-test <- get_decennial(geography = "tract",
-        variables = "B25077_001",
-        year = 2010,
-        state = "PA",
-        county = "Allegheny County",
-        geometry = TRUE)
+test <- get_acs(geography = "tract",
+                variables = "B25077_001",
+                year = 2010,
+                state = "PA",
+                county = "Allegheny County",
+                geometry = TRUE,
+                survey = "acs5")
 
 test
 
@@ -45,16 +46,16 @@ test |>
   geom_sf() +
   scale_fill_viridis_c()
 
-census_data_raw <- c(2010:2020) %>% 
+census_data_raw <- c(2010:2019) %>% 
   set_names() %>% 
   map_dfr({~get_acs(geography = "tract",
                     variables = "B25077_001",
                     year = .x,
                     state = "PA",
                     county = "Allegheny County",
-                    geometry = FALSE)},
+                    geometry = FALSE,
+                    survey = "acs5")},
       .id = "year") |> 
-  #rename(category = variable) |> 
   mutate(variable = "Owner-estimated median home value",
          NAME = str_c("Tract", GEOID, sep = " "),
          graph_type = "discrete",
@@ -64,7 +65,12 @@ census_data_raw <- c(2010:2020) %>%
 
 glimpse(census_data_raw)
 
-census_data_raw %>% 
+census_data_raw |> 
+  count(GEOID) |> 
+  distinct(n) |> 
+  nrow() == 1
+
+census_data_raw |>  
   write_csv("inputs/data_sources/median_owner_estimated_home_value.csv")
 
 census_data_raw |> 
