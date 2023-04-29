@@ -128,9 +128,30 @@ server <- function(input, output, session){
   })
   
   #define logic for how to accumulate tracts based on user clicks
+  #activate when user clicks on tract in map
   observeEvent(input$map_shape_click, {
     
-    if(input$map_shape_click$group == "base_map"){
+    #if the user has selected the max number of tracts, constrain the user to clearing highlights and removing previously selected tracts
+    #nested if statement
+    if (tract_count() >= 3) {
+      
+      if (input$map_shape_click$group == "hover_polygon") {
+        #remove highlight group
+      
+      proxy %>% clearGroup("hover_polygon")
+      
+      } else if (str_remove(input$map_shape_click$id, "^Tract ") %in% selected$groups) {
+        #when the user clicks a tract that is already in selected$groups, remove that tract from selected$groups and remove it from the second layer
+        
+        selected$groups <- setdiff(selected$groups, str_remove(input$map_shape_click$id, "^Tract "))
+        
+        proxy %>% clearGroup(input$map_shape_click$group)
+        
+      }
+    }
+    else {
+    #when the user has selected fewer than the max number of tracts, allow them to add new tracts, clear highlighted tracts, and remove previously selected tracts
+    if (input$map_shape_click$group == "base_map"){
       #when the user clicks a polygon on the basemap, add that polygon to selected$groups and display the new second layer
       selected$groups <- c(selected$groups, str_remove(input$map_shape_click$id, "^Tract ")) #remove "Tract " from start of id on the fly
       
@@ -147,7 +168,7 @@ server <- function(input, output, session){
                     layerId = ~GEOID, #feeds into later setdiff function to remove a tract
                     group = ~GEOID,
                     label = ~GEOID)
-    } else if(input$map_shape_click$group == "hover_polygon") {
+    } else if (input$map_shape_click$group == "hover_polygon") {
       #when the user clicks on a tract that is highlighted by plotly already, clear that highlighted polygon from the hover_polygon layer
       
       proxy %>% clearGroup("hover_polygon")
@@ -159,6 +180,7 @@ server <- function(input, output, session){
       
       proxy %>% clearGroup(input$map_shape_click$group)
       
+    }
     }
   }, ignoreInit = TRUE)
   
